@@ -16,5 +16,5 @@ This is the client-side application which functions as a collector for the hardw
 ```bash
 cd client
 cargo build --release
-cargo run
+cargo run --release
 ```
