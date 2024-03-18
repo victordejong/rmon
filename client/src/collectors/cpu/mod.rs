@@ -1,4 +1,4 @@
-use  crate::data_structs::LiveMetrics;
+use crate::LiveMetrics;
 
 #[cfg(target_os = "linux")]
 mod linux;

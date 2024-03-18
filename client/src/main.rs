@@ -11,7 +11,7 @@ mod collectors;
 use collectors::{cpu, mem};
 
 mod data_structs;
-use data_structs::{LiveMetrics, init_live_metrics_struct};
+use data_structs::live_metrics::{LiveMetrics, init_live_metrics_struct};
 
 const SLEEP_DUR: time::Duration = time::Duration::from_millis(5000);
 
