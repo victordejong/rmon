@@ -1,13 +1,13 @@
 use procfs::{CpuInfo, Current};
-use  crate::data_structs;
+use  crate::data_structs::LiveMetrics;
 
-pub fn get_cpu_data(live_metrics_struct: &mut data_structs::LiveMetrics) {
+pub fn get_cpu_data(live_metrics_struct: &mut LiveMetrics) {
 
     let cpustruct = match procfs::CpuInfo::current() {
         Err(error) => panic!("Cannot get CpuInfo struct: {}", error),
         Ok(result) => result,
     };
-    
+
     let cpu_cores: usize = procfs::CpuInfo::num_cores(&cpustruct);
     live_metrics_struct.cpu.amount = cpu_cores;
 
