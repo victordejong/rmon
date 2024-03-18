@@ -19,7 +19,7 @@ fn main() {
     let mut live_metrics: data_structs::LiveMetrics = data_structs::init_live_metrics_struct();
 
     loop {
-        collectors::cpu::collect_cpu_data(&mut live_metrics);
+        live_metrics = collectors::cpu::collect_cpu_data(live_metrics);
         
         println!("CPU: cores: {}, frequency average {} MHz", live_metrics.cpu.amount, live_metrics.cpu.freq);
         thread::sleep(SLEEP_DUR);
