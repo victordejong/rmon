@@ -35,10 +35,14 @@ fn print_to_console(live_metrics_struct: &LiveMetrics) {
         live_metrics_struct.cpu.amount, live_metrics_struct.cpu.freq, live_metrics_struct.cpu.cpu_load.load_1m, live_metrics_struct.cpu.cpu_load.load_5m,
         live_metrics_struct.cpu.cpu_load.load_15m);
 
-    if live_metrics_struct.mem.free > 10u64.pow(9) && live_metrics_struct.mem.cached > 10u64.pow(6) {
-        print!("MEM: free {} Gb, cached {} Mb; ", live_metrics_struct.mem.free as f32 / 1e9, live_metrics_struct.mem.cached as f32 / 1e6);
+
+    let mem_free: u64 = live_metrics_struct.mem.free;
+    let mem_cached: u64 = live_metrics_struct.mem.cached;
+
+    if mem_free > 10u64.pow(9) && mem_cached > 10u64.pow(6) {
+        print!("MEM: free {} Gb, cached {} Mb; ", mem_free as f32 / 1e9, mem_cached as f32 / 1e6);
     } else {
-        print!("MEM: free {} Kb, cached {} Kb; ", live_metrics_struct.mem.free, live_metrics_struct.mem.cached);
+        print!("MEM: free {} Kb, cached {} Kb; ", mem_free, mem_cached);
     }
     println!("");
 }
