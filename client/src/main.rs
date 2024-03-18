@@ -8,6 +8,7 @@ use chrono::{Local};
 use std::{thread, time};
 
 mod collectors;
+use collectors::{cpu, mem};
 
 mod data_structs;
 use data_structs::{LiveMetrics, init_live_metrics_struct};
@@ -21,8 +22,8 @@ fn main() {
     let mut live_metrics: LiveMetrics = init_live_metrics_struct();
 
     loop {
-        live_metrics = collectors::cpu::collect(live_metrics);
-        live_metrics = collectors::mem::collect(live_metrics);
+        live_metrics = cpu::collect(live_metrics);
+        live_metrics = mem::collect(live_metrics);
         
         print_to_console(&live_metrics);
 
@@ -31,8 +32,12 @@ fn main() {
 }
 
 fn print_to_console(live_metrics_struct: &LiveMetrics) {
-    print!("CPU: cores: {}, freq avg {} MHz, load {} {} {}; ",
-        live_metrics_struct.cpu.amount, live_metrics_struct.cpu.freq, live_metrics_struct.cpu.cpu_load.load_1m, live_metrics_struct.cpu.cpu_load.load_5m,
+
+    let mut cpu_freq_ext: String = "MHz".to_string();
+    let cpu_freq: f32 = if live_metrics_struct.cpu.freq > 1024. { cpu_freq_ext = "GHz".to_string(); live_metrics_struct.cpu.freq / 1024. } else { live_metrics_struct.cpu.freq };
+
+    print!("CPU: cores: {}, freq avg {} {}, load {} {} {}; ",
+        live_metrics_struct.cpu.amount, cpu_freq, cpu_freq_ext, live_metrics_struct.cpu.cpu_load.load_1m, live_metrics_struct.cpu.cpu_load.load_5m,
         live_metrics_struct.cpu.cpu_load.load_15m);
 
 
