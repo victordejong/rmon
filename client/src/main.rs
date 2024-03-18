@@ -14,11 +14,11 @@ mod data_structs;
 use data_structs::live_metrics::{LiveMetrics, init_live_metrics_struct};
 use data_structs::host_facts::{HostFacts, init_host_facts_struct};
 
-const SLEEP_DUR: time::Duration = time::Duration::from_millis(5000);
+const SLEEP_DUR: time::Duration = time::Duration::from_millis(10000);
 
 fn main() {
     println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
-    println!("Getting CPU info with 5 second intervals...");
+    println!("Getting system info with 10 second intervals...");
 
     let mut live_metrics: LiveMetrics = init_live_metrics_struct();
     let host_facts: HostFacts = init_host_facts_struct();
@@ -36,11 +36,13 @@ fn main() {
 fn print_to_console(live_metrics_struct: &LiveMetrics, host_facts_struct: &HostFacts) {
 
     let mut cpu_freq_ext: String = "MHz".to_string();
-    let cpu_freq: f32 = if live_metrics_struct.cpu.freq > 1024. { cpu_freq_ext = "GHz".to_string(); live_metrics_struct.cpu.freq / 1024. } else { live_metrics_struct.cpu.freq };
+    let cpu_freq: f32 = if live_metrics_struct.cpu.freq > 1024. { cpu_freq_ext = "GHz".to_string(); live_metrics_struct.cpu.freq / 1024. }
+        else { live_metrics_struct.cpu.freq };
+    let cpu_util: f32 = live_metrics_struct.cpu.cpu_load.load_1m / host_facts_struct.cpu.cores as f32;
 
-    print!("CPU: cores: {}, freq avg {:.2} {}, load {} {} {}; ",
+    print!("CPU: cores: {}, freq avg {:.2} {}, load {} {} {}, util {:.1}%; ",
         host_facts_struct.cpu.cores, cpu_freq, cpu_freq_ext, live_metrics_struct.cpu.cpu_load.load_1m, live_metrics_struct.cpu.cpu_load.load_5m,
-        live_metrics_struct.cpu.cpu_load.load_15m);
+        live_metrics_struct.cpu.cpu_load.load_15m, cpu_util*100.);
 
 
     let mem_avail: u64 = live_metrics_struct.mem.available;
