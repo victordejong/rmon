@@ -38,7 +38,7 @@ fn print_to_console(live_metrics_struct: &LiveMetrics, host_facts_struct: &HostF
     let mut cpu_freq_ext: String = "MHz".to_string();
     let cpu_freq: f32 = if live_metrics_struct.cpu.freq > 1024. { cpu_freq_ext = "GHz".to_string(); live_metrics_struct.cpu.freq / 1024. } else { live_metrics_struct.cpu.freq };
 
-    print!("CPU: cores: {}, freq avg {} {}, load {} {} {}; ",
+    print!("CPU: cores: {}, freq avg {:.2} {}, load {} {} {}; ",
         host_facts_struct.cpu.cores, cpu_freq, cpu_freq_ext, live_metrics_struct.cpu.cpu_load.load_1m, live_metrics_struct.cpu.cpu_load.load_5m,
         live_metrics_struct.cpu.cpu_load.load_15m);
 
@@ -47,10 +47,14 @@ fn print_to_console(live_metrics_struct: &LiveMetrics, host_facts_struct: &HostF
     let mem_cached: u64 = live_metrics_struct.mem.cached;
     let mem_used: u64 = host_facts_struct.mem.ram_total - live_metrics_struct.mem.free - mem_cached;
 
-    if mem_avail > 10u64.pow(9) && mem_cached > 10u64.pow(6) {
-        print!("MEM: used {} Gb, free {} Gb, cached {} Mb; ", mem_used as f32 / 1e9, mem_avail as f32 / 1e9, mem_cached as f32 / 1e6);
+    if mem_avail > 10u64.pow(9) {
+        if mem_cached > 1024 {
+            print!("MEM: used {:.2} Gb, free {:.2} Gb, cached {:.2} Gb; ", mem_used as f32 / 1e9, mem_avail as f32 / 1e9, mem_cached as f32 / 1e9);
+        } else{
+            print!("MEM: used {:.2} Gb, free {:.2} Gb, cached {:.2} Mb; ", mem_used as f32 / 1e9, mem_avail as f32 / 1e9, mem_cached as f32 / 1e6);
+        }
     } else {
-        print!("MEM: used {} Kb, free {} Kb, cached {} Kb; ", mem_used, mem_avail, mem_cached);
+        print!("MEM: used {:.2} Kb, free {:.2} Kb, cached {:.2} Kb; ", mem_used, mem_avail, mem_cached);
     }
     println!("");
 
