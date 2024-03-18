@@ -23,7 +23,10 @@ fn main() {
     loop {
         live_metrics = collectors::cpu::collect_cpu_data(live_metrics);
         
-        println!("CPU: cores: {}, frequency average {} MHz", live_metrics.cpu.amount, live_metrics.cpu.freq);
+        println!("CPU: cores: {}, frequency average {} MHz, load {} {} {}",
+            live_metrics.cpu.amount, live_metrics.cpu.freq, live_metrics.cpu.cpu_load.load_1m, live_metrics.cpu.cpu_load.load_5m,
+            live_metrics.cpu.cpu_load.load_15m);
+
         thread::sleep(SLEEP_DUR);
     }
 }

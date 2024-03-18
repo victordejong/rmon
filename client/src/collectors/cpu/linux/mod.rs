@@ -1,14 +1,14 @@
-use procfs::{CpuInfo, Current};
+use procfs::{CpuInfo, Current, LoadAverage};
 use  crate::data_structs::LiveMetrics;
 
 pub fn get_cpu_data(live_metrics_struct: &mut LiveMetrics) {
 
-    let cpustruct = match procfs::CpuInfo::current() {
-        Err(error) => panic!("Cannot get CpuInfo struct: {}", error),
+    let cpustruct: CpuInfo = match CpuInfo::current() {
+        Err(error) => panic!("Cannot get CpuInfo ProcFS struct: {}", error),
         Ok(result) => result,
     };
 
-    let cpu_cores: usize = procfs::CpuInfo::num_cores(&cpustruct);
+    let cpu_cores: usize = CpuInfo::num_cores(&cpustruct);
     live_metrics_struct.cpu.amount = cpu_cores;
 
     let mut total: f32 = 0.;
@@ -26,6 +26,19 @@ pub fn get_cpu_data(live_metrics_struct: &mut LiveMetrics) {
     }
 
     live_metrics_struct.cpu.freq = total / cpu_cores as f32;
+
+    return;
+}
+
+pub fn get_system_load(live_metrics_struct: &mut LiveMetrics) {
+    let loadstruct: LoadAverage = match LoadAverage::current() {
+        Err(error) => panic!("Cannot get LoadAverage ProcFS struct: {}", error),
+        Ok(result) => result,
+    };
+
+    live_metrics_struct.cpu.cpu_load.load_1m = loadstruct.one;
+    live_metrics_struct.cpu.cpu_load.load_5m = loadstruct.five;
+    live_metrics_struct.cpu.cpu_load.load_15m = loadstruct.fifteen;
 
     return;
 }
