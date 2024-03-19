@@ -14,11 +14,17 @@ mod data_structs;
 use data_structs::live_metrics::{LiveMetrics, init_live_metrics_struct};
 use data_structs::host_facts::{HostFacts, init_host_facts_struct};
 
-const SLEEP_DUR: time::Duration = time::Duration::from_millis(10000);
+mod config;
 
 fn main() {
+
+    let cmd_args: config::CmdArgs = config::parse_cmd_args();
+
     println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
-    println!("Getting system info with 10 second intervals...");
+
+    let sleep_duration: time::Duration = time::Duration::from_secs(cmd_args.interval);
+
+    println!("Getting system info with {} second intervals...", cmd_args.interval);
 
     let mut live_metrics: LiveMetrics = init_live_metrics_struct();
     let host_facts: HostFacts = init_host_facts_struct();
@@ -29,7 +35,7 @@ fn main() {
         
         print_to_console(&live_metrics, &host_facts);
 
-        thread::sleep(SLEEP_DUR);
+        thread::sleep(sleep_duration);
     }
 }
 
