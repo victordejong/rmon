@@ -97,6 +97,8 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
     return final_config;
 }
 
+// TODO: Split this out in some smart way. Maybe using generic types T?
+// https://doc.rust-lang.org/book/ch10-01-syntax.html
 fn override_variables(mut final_config: ConfigStruct, file_config: FileStruct,
     cmd_args_struct: CmdArgs, env_config: FileStruct) -> ConfigStruct {
 
