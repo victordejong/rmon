@@ -21,13 +21,12 @@ fn main() {
     let config_struct: config::ConfigStruct = config::parse_config_sources();
 
     println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
-    println!("Using config options: config: {}, interval: {}, rhost: {}", config_struct.config.unwrap_or("NONE".to_string()),
-        config_struct.interval.unwrap(),
+    println!("Using config options: interval: {}, rhost: {}", config_struct.interval,
         config_struct.rhost.unwrap_or("NONE".to_string()));
 
-    let sleep_duration: time::Duration = time::Duration::from_secs(config_struct.interval.unwrap());
+    let sleep_duration: time::Duration = time::Duration::from_secs(config_struct.interval);
 
-    println!("Getting system info with {} second intervals...", config_struct.interval.unwrap());
+    println!("Getting system info with {} second intervals...", config_struct.interval);
 
     let mut live_metrics: LiveMetrics = init_live_metrics_struct();
     let host_facts: HostFacts = init_host_facts_struct();

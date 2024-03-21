@@ -29,7 +29,7 @@ pub struct CmdArgs {
 
 #[derive(Deserialize)]
 #[allow(unused)]
-pub struct ConfigStruct {
+pub struct FileStruct {
 
     pub config: Option<String>,
 
@@ -38,14 +38,15 @@ pub struct ConfigStruct {
     pub rhost: Option<String>,
 }
 
+pub struct ConfigStruct {
+    pub interval: u64,
+
+    pub rhost: Option<String>,
+}
+
 pub fn parse_config_sources() -> ConfigStruct {
 
     let cmd_args_struct: CmdArgs = CmdArgs::parse();
-
-    match cmd_args_struct.rhost {
-        Some(ref hostname_port) => validate_hostname_port(&hostname_port),
-        None => (),
-    }
 
     let final_config = merge_config_sources(cmd_args_struct);
 
@@ -66,24 +67,39 @@ fn validate_hostname_port(hostname_port: &String) {
 
 fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
 
-    let mut file_config: ConfigStruct = Config::builder()
+    let mut file_config: FileStruct = Config::builder()
         .add_source(Environment::with_prefix("rmon_client"))
         .add_source(File::from(Path::new(&cmd_args_struct.config)).required(false))
         .build().unwrap().try_deserialize().unwrap();
+
+    let mut final_config = ConfigStruct {
+        interval: DEFAULT_INTERVAL,
+        rhost: None,
+    };
+
+    match file_config.interval {
+        Some(interval) => {final_config.interval = interval;}
+        None => (),
+    };
 
     if cmd_args_struct.interval != DEFAULT_INTERVAL {
         file_config.interval = Some(cmd_args_struct.interval);
     }
 
-    // Ensure a default is always set for file.config.interval, even if the type is Option
-    file_config.interval = Some(file_config.interval.unwrap_or(DEFAULT_INTERVAL));
-    file_config.config = Some(file_config.config.unwrap_or(DEFAULT_CONFIG_PATH.to_string()));
+    final_config.rhost = match file_config.rhost {
+        Some(hostname_port) => Some(hostname_port),
+        None => None,
+    };
 
-    // TODO: validate rhost from file_config
-    match cmd_args_struct.rhost {
-        Some(hostname_port) => file_config.rhost = Some(hostname_port),
+    final_config.rhost = match cmd_args_struct.rhost {
+        Some(hostname_port) => Some(hostname_port),
+        None => None,
+    };
+
+    match final_config.rhost {
+        Some(ref hostname_port) => {validate_hostname_port(&hostname_port);}
         None => (),
     };
 
-    return file_config;
+    return final_config;
 }
