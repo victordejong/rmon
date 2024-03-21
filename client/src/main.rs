@@ -18,13 +18,16 @@ mod config;
 
 fn main() {
 
-    let cmd_args: config::CmdArgs = config::parse_cmd_args();
+    let config_struct: config::ConfigStruct = config::parse_config_sources();
 
     println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
+    println!("Using config options: config: {}, interval: {}, rhost: {}", config_struct.config.unwrap_or("NONE".to_string()),
+        config_struct.interval.unwrap(),
+        config_struct.rhost.unwrap_or("NONE".to_string()));
 
-    let sleep_duration: time::Duration = time::Duration::from_secs(cmd_args.interval);
+    let sleep_duration: time::Duration = time::Duration::from_secs(config_struct.interval.unwrap());
 
-    println!("Getting system info with {} second intervals...", cmd_args.interval);
+    println!("Getting system info with {} second intervals...", config_struct.interval.unwrap());
 
     let mut live_metrics: LiveMetrics = init_live_metrics_struct();
     let host_facts: HostFacts = init_host_facts_struct();
