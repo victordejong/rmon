@@ -24,6 +24,14 @@ fn main() {
     println!("Using config options: interval: {}, rhost: {}", config_struct.interval,
         config_struct.rhost.unwrap_or("NONE".to_string()));
 
+    match config_struct.disks {
+        Some(disks) => {
+            println!("The following disks are configured to be monitored: {:?}",
+            disks.split(",").collect::<Vec<&str>>() );
+        }
+        None => (),
+    };
+
     let sleep_duration: time::Duration = time::Duration::from_secs(config_struct.interval);
 
     println!("Getting system info with {} second intervals...", config_struct.interval);

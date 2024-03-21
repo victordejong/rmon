@@ -25,6 +25,10 @@ pub struct CmdArgs {
     /// Remote collection server
     #[arg(short, long, value_name = "HOST:PORT")]
     pub rhost: Option<String>,
+
+    /// Disks to be monitored, given as a comma separated list
+    #[arg(short, long)]
+    pub disks: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -34,12 +38,16 @@ pub struct FileStruct {
     pub interval: Option<u64>,
 
     pub rhost: Option<String>,
+
+    pub disks: Option<String>,
 }
 
 pub struct ConfigStruct {
     pub interval: u64,
 
     pub rhost: Option<String>,
+
+    pub disks: Option<String>,
 }
 
 pub fn parse_config_sources() -> ConfigStruct {
@@ -81,7 +89,16 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
     let mut final_config = ConfigStruct {
         interval: DEFAULT_INTERVAL,
         rhost: None,
+        disks: None,
     };
+
+    final_config = override_variables(final_config, file_config, cmd_args_struct, env_config);
+
+    return final_config;
+}
+
+fn override_variables(mut final_config: ConfigStruct, file_config: FileStruct,
+    cmd_args_struct: CmdArgs, env_config: FileStruct) -> ConfigStruct {
 
     // Configure interval
     match file_config.interval {
@@ -117,6 +134,22 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
     // Check RHOST validity, if set
     match final_config.rhost {
         Some(ref hostname_port) => {validate_hostname_port(&hostname_port);}
+        None => (),
+    };
+
+    // Configure disks
+    match file_config.disks {
+        Some(disks) => { final_config.disks = Some(disks); },
+        None => (),
+    };
+
+     match cmd_args_struct.disks {
+        Some(disks) => { final_config.disks = Some(disks); },
+        None => (),
+    };
+
+    match env_config.disks {
+        Some(disks) => { final_config.disks = Some(disks); },
         None => (),
     };
 
