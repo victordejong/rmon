@@ -79,6 +79,7 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
     file_config.interval = Some(file_config.interval.unwrap_or(DEFAULT_INTERVAL));
     file_config.config = Some(file_config.config.unwrap_or(DEFAULT_CONFIG_PATH.to_string()));
 
+    // TODO: validate rhost from file_config
     match cmd_args_struct.rhost {
         Some(hostname_port) => file_config.rhost = Some(hostname_port),
         None => (),
