@@ -28,10 +28,8 @@ pub struct CmdArgs {
 }
 
 #[derive(Deserialize)]
-#[allow(unused)]
+// #[allow(unused)]
 pub struct FileStruct {
-
-    pub config: Option<String>,
 
     pub interval: Option<u64>,
 
@@ -65,11 +63,19 @@ fn validate_hostname_port(hostname_port: &String) {
     return;
 }
 
+
+// Priority is as follows (lower overrides higher):
+// 3. config on disk, 2. cmd line variables, 1. ENV variables
 fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
 
-    let mut file_config: FileStruct = Config::builder()
-        .add_source(Environment::with_prefix("rmon_client"))
+    // Build the config from disk (if applicable)
+    let file_config: FileStruct = Config::builder()
         .add_source(File::from(Path::new(&cmd_args_struct.config)).required(false))
+        .build().unwrap().try_deserialize().unwrap();
+
+    // Build the config from possible present ENV variables
+    let env_config: FileStruct = Config::builder()
+        .add_source(Environment::with_prefix("rmon_client"))
         .build().unwrap().try_deserialize().unwrap();
 
     let mut final_config = ConfigStruct {
@@ -77,25 +83,38 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
         rhost: None,
     };
 
+    // Configure interval
     match file_config.interval {
-        Some(interval) => {final_config.interval = interval;}
+        Some(interval) => { final_config.interval = interval; }
         None => (),
     };
 
     if cmd_args_struct.interval != DEFAULT_INTERVAL {
-        file_config.interval = Some(cmd_args_struct.interval);
+        final_config.interval = cmd_args_struct.interval;
     }
 
-    final_config.rhost = match file_config.rhost {
-        Some(hostname_port) => Some(hostname_port),
-        None => None,
+    match env_config.interval {
+        Some(interval) => { final_config.interval = interval; }
+        None => (),
     };
 
-    final_config.rhost = match cmd_args_struct.rhost {
-        Some(hostname_port) => Some(hostname_port),
-        None => None,
+    // Configure RHOST
+    match file_config.rhost {
+        Some(hostname_port) => { final_config.rhost = Some(hostname_port); },
+        None => (),
     };
 
+     match cmd_args_struct.rhost {
+        Some(hostname_port) => { final_config.rhost = Some(hostname_port); },
+        None => (),
+    };
+
+    match env_config.rhost {
+        Some(hostname_port) => { final_config.rhost = Some(hostname_port); },
+        None => (),
+    };
+
+    // Check RHOST validity, if set
     match final_config.rhost {
         Some(ref hostname_port) => {validate_hostname_port(&hostname_port);}
         None => (),
