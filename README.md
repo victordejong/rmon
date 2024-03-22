@@ -12,6 +12,12 @@ Remote MONitoring, a system monitoring tool written in Rust.
 
 This is the client-side application which functions as a collector for the hardware statistics.
 
+### Features
+
+- Collect CPU, Memory metrics in a configurable interval
+- Read configuration from disk, commandline or environment variables
+- Print collected metrics to console
+
 ### Run
 ```bash
 cd client
