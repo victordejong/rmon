@@ -159,12 +159,12 @@ fn override_variables(mut final_config: ConfigStruct, file_config: FileStruct,
 }
 
 fn parse_disks(disks: String) -> Vec<String> {
-    let split_disks: Vec<String> = disks.split(",").map(|s| s.to_string()).collect::<Vec<String>>();
+    let split_disks: Vec<String> = disks.split(",").map(|s| String::from(s)).collect::<Vec<String>>();
     let mut output: Vec<String> = vec![];
 
     for disk in split_disks.iter() {
         if disk.contains("/dev/") {
-            output.push(disk.strip_prefix("/dev/").unwrap().to_string());
+            output.push(String::from(disk.strip_prefix("/dev/").unwrap()));
         }
     }
 

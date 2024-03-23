@@ -25,8 +25,8 @@ pub fn init_host_facts_struct() -> HostFacts {
     let mut host_facts = HostFacts {
         cpu: Cpu {
             cores: 0,
-            vendor_id: "".to_string(),
-            model_name: "".to_string(),
+            vendor_id: String::new(),
+            model_name: String::new(),
         },
         mem: Mem {
             ram_total: 0,

@@ -56,7 +56,7 @@ pub fn init_live_metrics_struct(disks: &Option<Vec<String>>) -> LiveMetrics {
             for disk in conf_disks.iter() {
                 live_metrics_struct.disks.push(
                     Disk {
-                        name: disk.to_string(),
+                        name: String::from(disk),
                         total_reads: 0,
                         total_writes: 0,
                         current_io: 0,

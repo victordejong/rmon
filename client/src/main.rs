@@ -22,7 +22,7 @@ fn main() {
 
     println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
     println!("Using config options: interval: {}, rhost: {}", config_struct.interval,
-        config_struct.rhost.unwrap_or("NONE".to_string()));
+        config_struct.rhost.unwrap_or(String::from("NONE")));
 
     let mut disks_configured: bool = false;
 
@@ -60,8 +60,8 @@ fn main() {
 fn print_to_console(live_metrics_struct: &LiveMetrics, host_facts_struct: &HostFacts) {
 
     // Print CPU details
-    let mut cpu_freq_ext: String = "MHz".to_string();
-    let cpu_freq: f32 = if live_metrics_struct.cpu.freq > 1024. { cpu_freq_ext = "GHz".to_string(); live_metrics_struct.cpu.freq / 1024. }
+    let mut cpu_freq_ext: String = String::from("MHz");
+    let cpu_freq: f32 = if live_metrics_struct.cpu.freq > 1024. { cpu_freq_ext = String::from("GHz"); live_metrics_struct.cpu.freq / 1024. }
         else { live_metrics_struct.cpu.freq };
     let cpu_util: f32 = live_metrics_struct.cpu.cpu_load.load_1m / host_facts_struct.cpu.cores as f32;
 
