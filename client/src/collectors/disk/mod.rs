@@ -5,11 +5,11 @@ use crate::HostFacts;
 mod linux;
 use linux::{get_disk_stats, get_host_facts};
 
-pub fn collect(mut live_metrics_struct: LiveMetrics, mut disks: Vec<String>) -> (LiveMetrics, Option<Vec<String>>) {
+pub fn collect(mut live_metrics_struct: LiveMetrics) -> LiveMetrics {
 
-    disks = get_disk_stats(&mut live_metrics_struct, disks);
+    get_disk_stats(&mut live_metrics_struct);
 
-    return (live_metrics_struct, Some(disks));
+    return live_metrics_struct;
 }
 
 pub fn collect_host_facts(mut host_facts_struct: HostFacts) -> HostFacts {

@@ -2,13 +2,12 @@ use procfs::{DiskStat, DiskStats, Current};
 use crate::LiveMetrics;
 use crate::HostFacts;
 
-pub fn get_disk_stats(live_metrics_struct: &mut LiveMetrics, disks: Vec<String>) -> Vec<String> {
+pub fn get_disk_stats(live_metrics_struct: &mut LiveMetrics) {
     let system_disks: Vec<DiskStat> = match DiskStats::current() {
         Err(error) => panic!("Cannot get DiskStats ProcFS struct: {}", error),
         Ok(result) => result.0,
     };
 
-    // TODO: What the fuck?
     for system_disk in system_disks.iter() {
         for config_disk in live_metrics_struct.disks.iter_mut() {
             if system_disk.name == config_disk.name {
@@ -19,7 +18,7 @@ pub fn get_disk_stats(live_metrics_struct: &mut LiveMetrics, disks: Vec<String>)
         }
     }
 
-    return disks;
+    return;
 }
 
 pub fn get_host_facts(host_facts_struct: &mut HostFacts) {

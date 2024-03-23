@@ -18,7 +18,7 @@ mod config;
 
 fn main() {
 
-    let mut config_struct: config::ConfigStruct = config::parse_config_sources();
+    let config_struct: config::ConfigStruct = config::parse_config_sources();
 
     println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
     println!("Using config options: interval: {}, rhost: {}", config_struct.interval,
@@ -39,8 +39,6 @@ fn main() {
     println!("Getting system info with {} second intervals...", config_struct.interval);
 
     let mut live_metrics: LiveMetrics = init_live_metrics_struct(&config_struct.disks);
-    // TODO: Load all available disks in the hostfacs,
-    //       give warning if disks are configured which are not present.
     let host_facts: HostFacts = init_host_facts_struct();
     println!("The following disks have been detected in the system: {:?}", host_facts.disks);
 
@@ -49,7 +47,7 @@ fn main() {
         live_metrics = mem::collect(live_metrics);
 
         if disks_configured {
-            (live_metrics, config_struct.disks) = disk::collect(live_metrics, config_struct.disks.unwrap());
+            live_metrics = disk::collect(live_metrics);
         }
         
         print_to_console(&live_metrics, &host_facts);
