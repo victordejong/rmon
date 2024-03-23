@@ -5,6 +5,7 @@ Desciption: This struct holds all realtime metrics for a host. The metrics this 
 pub struct LiveMetrics {
     pub cpu: Cpu,
     pub mem: Mem,
+    pub disks: Vec<Disk>,
 }
 
 pub struct Cpu {
@@ -24,8 +25,15 @@ pub struct Mem {
     pub cached: u64,
 }
 
-pub fn init_live_metrics_struct() -> LiveMetrics {
-    let live_metrics_struct = LiveMetrics {
+pub struct Disk {
+    pub name: String,
+    pub total_reads: u64,
+    pub total_writes: u64,
+    pub current_io: u64,
+}
+
+pub fn init_live_metrics_struct(disks: &Option<Vec<String>>) -> LiveMetrics {
+    let mut live_metrics_struct = LiveMetrics {
         cpu: Cpu {
             freq: 0.,
             cpu_load: CpuLoad {
@@ -38,8 +46,27 @@ pub fn init_live_metrics_struct() -> LiveMetrics {
             free: 0,
             available: 0,
             cached: 0,
-        }
+        },
+        disks: vec![],
     };
+
+    match disks {
+        None => (),
+        Some(conf_disks) => {
+            for disk in conf_disks.iter() {
+                live_metrics_struct.disks.push(
+                    Disk {
+                        name: disk.to_string(),
+                        total_reads: 0,
+                        total_writes: 0,
+                        current_io: 0,
+                    }
+                );
+            }
+        }
+    }
+
+    
 
     return live_metrics_struct;
 }
