@@ -15,6 +15,7 @@ This is the client-side application which functions as a collector for the hardw
 ### Features
 
 - Collect CPU, Memory metrics in a configurable interval
+- Collect disk info using a user provided list
 - Read configuration from disk, commandline or environment variables
 - Print collected metrics to console
 
