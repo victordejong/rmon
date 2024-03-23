@@ -3,11 +3,12 @@ Desciption: This struct holds all inventory facts for a host. The metrics this s
             and are considered static for the duration the program is expected to compute.
 */
 
-use crate::collectors::{cpu, mem};
+use crate::collectors::{cpu, mem, disk};
 
 pub struct HostFacts {
     pub cpu: Cpu,
     pub mem: Mem,
+    pub disks: Vec<String>,
 }
 
 pub struct Cpu {
@@ -32,6 +33,7 @@ pub fn init_host_facts_struct() -> HostFacts {
             ram_total: 0,
             swap_total: 0,
         },
+        disks: vec![],
     };
 
     host_facts = populate_host_facts_struct(host_facts);
@@ -42,5 +44,6 @@ pub fn init_host_facts_struct() -> HostFacts {
 fn populate_host_facts_struct(mut host_facts_struct: HostFacts) -> HostFacts {
     host_facts_struct = cpu::collect_host_facts(host_facts_struct);
     host_facts_struct = mem::collect_host_facts(host_facts_struct);
+    host_facts_struct = disk::collect_host_facts(host_facts_struct);
     return host_facts_struct;
 }

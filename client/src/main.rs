@@ -42,6 +42,7 @@ fn main() {
     // TODO: Load all available disks in the hostfacs,
     //       give warning if disks are configured which are not present.
     let host_facts: HostFacts = init_host_facts_struct();
+    println!("The following disks have been detected in the system: {:?}", host_facts.disks);
 
     loop {
         live_metrics = cpu::collect(live_metrics);
