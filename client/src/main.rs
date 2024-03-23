@@ -16,6 +16,8 @@ use data_structs::host_facts::{HostFacts, init_host_facts_struct};
 
 mod config;
 
+mod util;
+
 fn main() {
 
     let config_struct: config::ConfigStruct = config::parse_config_sources();
@@ -40,6 +42,10 @@ fn main() {
 
     let mut live_metrics: LiveMetrics = init_live_metrics_struct(&config_struct.disks);
     let host_facts: HostFacts = init_host_facts_struct();
+
+    // Check if configured disks are present on system
+    util::undetected_disks::warn_undetected_disks(&live_metrics, &host_facts);
+    
     println!("The following disks have been detected in the system: {:?}", host_facts.disks);
 
     loop {

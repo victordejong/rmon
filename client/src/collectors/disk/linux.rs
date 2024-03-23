@@ -28,7 +28,7 @@ pub fn get_host_facts(host_facts_struct: &mut HostFacts) {
     };
 
     for system_disk in system_disks {
-        host_facts_struct.disks.push(String::from("/dev/") + &system_disk.name);
+        host_facts_struct.disks.push(String::from(system_disk.name));
     }
 
     return;
