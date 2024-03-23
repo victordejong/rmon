@@ -125,8 +125,6 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
     return final_config;
 }
 
-// TODO: Split this out in some smart way. Maybe using generic types T?
-// https://doc.rust-lang.org/book/ch10-01-syntax.html
 fn override_variables<T: ConfigFields>(mut final_config: ConfigStruct, config: T) -> ConfigStruct {
 
     // Configure interval
