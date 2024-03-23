@@ -4,7 +4,6 @@ Description: A client side collection tool for system metric collection.
 Author: Victor de Jong <victor@victordejong.com>
 */
 
-use chrono::{Local};
 use std::{thread, time};
 
 mod collectors;
@@ -22,7 +21,6 @@ fn main() {
 
     let config_struct: config::ConfigStruct = config::parse_config_sources();
 
-    println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
     println!("Using config options: interval: {}, rhost: {}", config_struct.interval,
         config_struct.rhost.unwrap_or(String::from("NONE")));
 

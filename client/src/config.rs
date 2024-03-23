@@ -4,6 +4,7 @@ use exitcode;
 use config::{Config, File, Environment};
 use std::path::Path;
 use serde::Deserialize;
+use chrono::{Local};
 
 // Randomly picked interval
 // Guaranteed to be random, chosen by fair D12 dice roll
@@ -72,6 +73,8 @@ pub fn parse_config_sources() -> ConfigStruct {
 
     let cmd_args_struct: CmdArgs = CmdArgs::parse();
 
+    println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
+
     let final_config = merge_config_sources(cmd_args_struct);
 
     return final_config;
@@ -93,6 +96,11 @@ fn validate_hostname_port(hostname_port: &String) {
 // Priority is as follows (lower overrides higher):
 // 3. config on disk, 2. cmd line variables, 1. ENV variables
 fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
+
+    // Print warning if given config file does not exist on disk
+    if !Path::new(&cmd_args_struct.config).exists() {
+        println!("WARNING: configured config file {} does not exist!", &cmd_args_struct.config);
+    }
 
     // Build the config from disk (if applicable)
     let file_config: FileStruct = Config::builder()
