@@ -18,9 +18,9 @@ pub struct CmdArgs {
     #[arg(short, long, default_value = DEFAULT_CONFIG_PATH)]
     pub config: String,
 
-    /// Collection interval in seconds
-    #[arg(short, long, default_value_t = DEFAULT_INTERVAL)]
-    pub interval: u64,
+    /// Collection interval in seconds [default: 10]
+    #[arg(short, long)]
+    pub interval: Option<u64>,
 
     /// Remote collection server
     #[arg(short, long, value_name = "HOST:PORT")]
@@ -48,6 +48,24 @@ pub struct ConfigStruct {
     pub rhost: Option<String>,
 
     pub disks: Option<Vec<String>>,
+}
+
+trait ConfigFields {
+    fn interval(&self) -> Option<u64>;
+    fn rhost(&self) -> &Option<String>;
+    fn disks(&self) -> &Option<String>;
+}
+
+impl ConfigFields for FileStruct {
+    fn interval(&self) -> Option<u64> { self.interval }
+    fn rhost(&self) -> &Option<String> { &self.rhost }
+    fn disks(&self) -> &Option<String> { &self.disks }
+}
+
+impl ConfigFields for CmdArgs {
+    fn interval(&self) -> Option<u64> { self.interval }
+    fn rhost(&self) -> &Option<String> { &self.rhost }
+    fn disks(&self) -> &Option<String> { &self.disks }
 }
 
 pub fn parse_config_sources() -> ConfigStruct {
@@ -92,44 +110,26 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
         disks: None,
     };
 
-    final_config = override_variables(final_config, file_config, cmd_args_struct, env_config);
+    final_config = override_variables(final_config, file_config);
+    final_config = override_variables(final_config, cmd_args_struct);
+    final_config = override_variables(final_config, env_config);
 
     return final_config;
 }
 
 // TODO: Split this out in some smart way. Maybe using generic types T?
 // https://doc.rust-lang.org/book/ch10-01-syntax.html
-fn override_variables(mut final_config: ConfigStruct, file_config: FileStruct,
-    cmd_args_struct: CmdArgs, env_config: FileStruct) -> ConfigStruct {
+fn override_variables<T: ConfigFields>(mut final_config: ConfigStruct, config: T) -> ConfigStruct {
 
     // Configure interval
-    match file_config.interval {
-        Some(interval) => { final_config.interval = interval; }
-        None => (),
-    };
-
-    if cmd_args_struct.interval != DEFAULT_INTERVAL {
-        final_config.interval = cmd_args_struct.interval;
-    }
-
-    match env_config.interval {
+    match config.interval() {
         Some(interval) => { final_config.interval = interval; }
         None => (),
     };
 
     // Configure RHOST
-    match file_config.rhost {
-        Some(hostname_port) => { final_config.rhost = Some(hostname_port); },
-        None => (),
-    };
-
-     match cmd_args_struct.rhost {
-        Some(hostname_port) => { final_config.rhost = Some(hostname_port); },
-        None => (),
-    };
-
-    match env_config.rhost {
-        Some(hostname_port) => { final_config.rhost = Some(hostname_port); },
+    match config.rhost() {
+        Some(hostname_port) => { final_config.rhost = Some(String::from(hostname_port)); },
         None => (),
     };
 
@@ -140,18 +140,8 @@ fn override_variables(mut final_config: ConfigStruct, file_config: FileStruct,
     };
 
     // Configure disks
-    match file_config.disks {
-        Some(disks) => { final_config.disks = Some(parse_disks(disks)); },
-        None => (),
-    };
-
-     match cmd_args_struct.disks {
-        Some(disks) => { final_config.disks = Some(parse_disks(disks)); },
-        None => (),
-    };
-
-    match env_config.disks {
-        Some(disks) => { final_config.disks = Some(parse_disks(disks)); },
+    match config.disks() {
+        Some(disks) => { final_config.disks = Some(parse_disks(String::from(disks))); },
         None => (),
     };
 
