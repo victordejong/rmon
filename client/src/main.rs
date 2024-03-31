@@ -62,6 +62,7 @@ async fn main() {
     util::undetected_disks::warn_undetected_disks(&live_metrics, &host_facts);
     
     println!("The following disks have been detected in the system: {:?}", host_facts.disks);
+    println!("The following hostname has been detected: {}", String::from(&host_facts.system.hostname));
 
     loop {
         live_metrics = cpu::collect(live_metrics);
@@ -76,7 +77,7 @@ async fn main() {
                 .expect(&format!("ERROR: connection to server http://{} failed!", remote_host));
 
             let request: Request<LiveMetricsMessage> = tonic::Request::new(LiveMetricsMessage {
-                name: "Tonic".into(),
+                name: String::from(&host_facts.system.hostname),
             });
 
             client.send_live_metrics(request).await.unwrap();
