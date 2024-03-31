@@ -1,0 +1,14 @@
+syntax = "proto3";
+package livemetrics;
+
+service Greeter {
+    rpc SendLiveMetrics (LiveMetricsMessage) returns (LiveMetricsReply);
+}
+
+message LiveMetricsMessage {
+    string name = 1;
+}
+
+message LiveMetricsReply {
+    bool success = 1;
+}
