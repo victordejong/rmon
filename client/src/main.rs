@@ -6,23 +6,39 @@ Author: Victor de Jong <victor@victordejong.com>
 
 use std::{thread, time};
 
+use live_metrics_protobuf::greeter_client::GreeterClient;
+use live_metrics_protobuf::LiveMetricsMessage;
+
+pub mod live_metrics_protobuf {
+    tonic::include_proto!("livemetrics");
+}
+
 mod collectors;
 use collectors::{cpu, mem, disk};
 
 mod data_structs;
-use data_structs::live_metrics::{LiveMetrics, init_live_metrics_struct};
+use data_structs::live_metrics::{init_live_metrics_struct, LiveMetrics};
 use data_structs::host_facts::{HostFacts, init_host_facts_struct};
+use tonic::Request;
 
 mod config;
 
 mod util;
 
-fn main() {
+#[tokio::main]
+async fn main() {
 
     let config_struct: config::ConfigStruct = config::parse_config_sources();
 
-    println!("Using config options: interval: {}, rhost: {}", config_struct.interval,
-        config_struct.rhost.unwrap_or(String::from("NONE")));
+    let mut rhost_configured: bool = false;
+    let remote_host: String = match config_struct.rhost {
+        Some(ref remote) => {
+            rhost_configured = true;
+            String::from(remote)
+        }
+        None => String::from("NONE")
+    };
+    println!("Using config options: interval: {}, rhost: {}", config_struct.interval, remote_host);
 
     let mut disks_configured: bool = false;
 
@@ -38,6 +54,7 @@ fn main() {
 
     println!("Getting system info with {} second intervals...", config_struct.interval);
 
+    // Initialize metrics structs
     let mut live_metrics: LiveMetrics = init_live_metrics_struct(&config_struct.disks);
     let host_facts: HostFacts = init_host_facts_struct();
 
@@ -52,6 +69,17 @@ fn main() {
 
         if disks_configured {
             live_metrics = disk::collect(live_metrics);
+        }
+
+        if rhost_configured {
+            let mut client = GreeterClient::connect(format!("http://{}", remote_host)).await
+                .expect(&format!("ERROR: connection to server http://{} failed!", remote_host));
+
+            let request: Request<LiveMetricsMessage> = tonic::Request::new(LiveMetricsMessage {
+                name: "Tonic".into(),
+            });
+
+            client.send_live_metrics(request).await.unwrap();
         }
         
         print_to_console(&live_metrics, &host_facts);

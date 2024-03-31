@@ -4,7 +4,7 @@ use exitcode;
 use config::{Config, File, Environment};
 use std::path::Path;
 use serde::Deserialize;
-use chrono::{Local};
+use chrono::Local;
 
 // Randomly picked interval
 // Guaranteed to be random, chosen by fair D12 dice roll
