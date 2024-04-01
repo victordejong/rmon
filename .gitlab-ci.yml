@@ -46,14 +46,14 @@ rust-check:server:
 rust-build:client:
   extends: .rust-build
   script:
-    cd client/
-    cargo build --release
+    - cd client/
+    - cargo build --release
 
 rust-build:server:
   extends: .rust-build
   script:
-    cd server/
-    cargo build --release
+    - cd server/
+    - cargo build --release
 
 sast:
   stage: test
