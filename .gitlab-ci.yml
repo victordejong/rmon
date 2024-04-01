@@ -10,16 +10,21 @@ stages:
 - test
 - build
 
-rust-check:client:
+.rust-check:
   stage: lint
   image: rust
+  before_script:
+    - apt update
+    - apt install protobuf-compiler -y
+
+rust-check:client:
+  extends: .rust-check
   script:
     - cd client/
     - cargo check
 
 rust-check:server:
-  stage: lint
-  image: rust
+  extends: .rust-check
   script:
     - cd client/
     - cargo check
