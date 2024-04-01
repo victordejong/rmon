@@ -17,6 +17,20 @@ stages:
     - apt update
     - apt install protobuf-compiler -y
 
+.rust-build:
+  stage: build
+  image: rust
+  before_script:
+    - apt update
+    - apt install protobuf-compiler -y
+  artifacts:
+    untracked: false
+    when: on_success
+    access: 'developer'
+    expire_in: "30 days"
+    paths:
+      - target/release/
+
 rust-check:client:
   extends: .rust-check
   script:
@@ -26,8 +40,20 @@ rust-check:client:
 rust-check:server:
   extends: .rust-check
   script:
-    - cd client/
+    - cd server/
     - cargo check
+
+rust-build:client:
+  extends: .rust-build
+  script:
+    cd client/
+    cargo build --release
+
+rust-build:server:
+  extends: .rust-build
+  script:
+    cd server/
+    cargo build --release
 
 sast:
   stage: test
