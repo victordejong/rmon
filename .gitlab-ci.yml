@@ -28,8 +28,6 @@ stages:
     when: on_success
     access: 'developer'
     expire_in: "30 days"
-    paths:
-      - target/release/
 
 rust-check:client:
   extends: .rust-check
@@ -48,12 +46,18 @@ rust-build:client:
   script:
     - cd client/
     - cargo build --release
+  artifacts:
+    paths:
+      - client/target/release/
 
 rust-build:server:
   extends: .rust-build
   script:
     - cd server/
     - cargo build --release
+  artifacts:
+    paths:
+      - server/target/release/
 
 sast:
   stage: test
