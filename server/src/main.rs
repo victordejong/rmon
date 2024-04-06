@@ -19,6 +19,7 @@ pub mod host_facts_protobuf {
 
 #[derive(Debug, Default)]
 pub struct LiveMetricsGreeter {}
+
 #[derive(Debug, Default)]
 pub struct ServerHostFactsGreeter {}
 
