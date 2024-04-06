@@ -1,0 +1,31 @@
+syntax = "proto3";
+package hostfacts;
+
+service HostFactsGreeter {
+    rpc SendHostFacts (HostFactsMessage) returns (HostFactsReply);
+}
+
+message HostFactsMessage {
+
+    HostCpuMessage cpu = 1;
+    HostMemMessage mem = 2;
+    repeated string disks = 3;
+    HostSystemMessage system = 4;
+
+    message HostCpuMessage {
+        fixed64 cores = 1;
+        string vendor_id = 2;
+        string model_name = 3;
+    }
+    message HostMemMessage {
+        fixed64 ram_total = 1;
+        fixed64 swap_total = 2;
+    }
+    message HostSystemMessage {
+        string hostname = 1;
+    }
+}
+
+message HostFactsReply {
+    bool success = 1;
+}
