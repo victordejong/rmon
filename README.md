@@ -5,7 +5,7 @@ Remote MONitoring, a system monitoring tool written in Rust.
 ## Scope of this project
 
 - [x] Client monitoring tool
-- [ ] Remote collection server
+- [x] Remote collection server
 - [ ] Web interface
 
 ## RMON-Client
