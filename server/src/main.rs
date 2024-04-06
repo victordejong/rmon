@@ -26,7 +26,7 @@ impl Greeter for LiveMetricsGreeter {
         request: Request<LiveMetricsMessage>,
     ) -> Result<Response<LiveMetricsReply>, Status> {
         //println!("Got a request: {:?}", request);
-        //print_received_host_facts(request);
+        printer::livemetrics_printer::print_received_live_metrics(&request);
 
         let reply = live_metrics_protobuf::LiveMetricsReply {
             success: true,
