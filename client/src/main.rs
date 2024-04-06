@@ -6,21 +6,15 @@ Author: Victor de Jong <victor@victordejong.com>
 
 use std::{thread, time};
 
-use live_metrics_protobuf::greeter_client::GreeterClient;
-use live_metrics_protobuf::LiveMetricsMessage;
-use live_metrics_protobuf::live_metrics_message::{CpuMessage,MemMessage,SystemMessage};
-
-pub mod live_metrics_protobuf {
-    tonic::include_proto!("livemetrics");
-}
-
 mod collectors;
 use collectors::{cpu, mem, disk};
+
+mod transport;
+use transport::send_hostfacts::send_host_facts_to_remote;
 
 mod data_structs;
 use data_structs::live_metrics::{init_live_metrics_struct, LiveMetrics};
 use data_structs::host_facts::{HostFacts, init_host_facts_struct};
-use tonic::Request;
 
 mod config;
 
@@ -59,6 +53,10 @@ async fn main() {
     let mut live_metrics: LiveMetrics = init_live_metrics_struct(&config_struct.disks);
     let host_facts: HostFacts = init_host_facts_struct();
 
+    if rhost_configured {
+        send_host_facts_to_remote(&remote_host, &host_facts).await;
+    };
+
     // Check if configured disks are present on system
     util::undetected_disks::warn_undetected_disks(&live_metrics, &host_facts);
     
@@ -73,29 +71,6 @@ async fn main() {
             live_metrics = disk::collect(live_metrics);
         }
 
-        if rhost_configured {
-            let mut client = GreeterClient::connect(format!("http://{}", remote_host)).await
-                .expect(&format!("ERROR: connection to server http://{} failed!", remote_host));
-
-            let request: Request<LiveMetricsMessage> = tonic::Request::new(LiveMetricsMessage {
-                cpu: Some(CpuMessage {
-                    cores: (host_facts.cpu.cores as u64),
-                    vendor_id: String::from(&host_facts.cpu.vendor_id),
-                    model_name: String::from(&host_facts.cpu.model_name),
-                }),
-                mem: Some(MemMessage {
-                    ram_total: host_facts.mem.ram_total,
-                    swap_total: host_facts.mem.swap_total,
-                }),
-                disks: host_facts.disks.clone(),
-                system: Some(SystemMessage {
-                    hostname: String::from(&host_facts.system.hostname),
-                })
-            });
-
-            client.send_live_metrics(request).await.unwrap();
-        }
-        
         print_to_console(&live_metrics, &host_facts);
 
         thread::sleep(sleep_duration);
