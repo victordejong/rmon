@@ -6,7 +6,24 @@ service Greeter {
 }
 
 message LiveMetricsMessage {
-    string name = 1;
+
+    CpuMessage cpu = 1;
+    MemMessage mem = 2;
+    repeated string disks = 3;
+    SystemMessage system = 4;
+
+    message CpuMessage {
+        fixed64 cores = 1;
+        string vendor_id = 2;
+        string model_name = 3;
+    }
+    message MemMessage {
+        fixed64 ram_total = 1;
+        fixed64 swap_total = 2;
+    }
+    message SystemMessage {
+        string hostname = 1;
+    }
 }
 
 message LiveMetricsReply {
