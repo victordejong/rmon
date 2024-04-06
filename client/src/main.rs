@@ -8,6 +8,7 @@ use std::{thread, time};
 
 use live_metrics_protobuf::greeter_client::GreeterClient;
 use live_metrics_protobuf::LiveMetricsMessage;
+use live_metrics_protobuf::live_metrics_message::{CpuMessage,MemMessage,SystemMessage};
 
 pub mod live_metrics_protobuf {
     tonic::include_proto!("livemetrics");
@@ -77,7 +78,19 @@ async fn main() {
                 .expect(&format!("ERROR: connection to server http://{} failed!", remote_host));
 
             let request: Request<LiveMetricsMessage> = tonic::Request::new(LiveMetricsMessage {
-                name: String::from(&host_facts.system.hostname),
+                cpu: Some(CpuMessage {
+                    cores: (host_facts.cpu.cores as u64),
+                    vendor_id: String::from(&host_facts.cpu.vendor_id),
+                    model_name: String::from(&host_facts.cpu.model_name),
+                }),
+                mem: Some(MemMessage {
+                    ram_total: host_facts.mem.ram_total,
+                    swap_total: host_facts.mem.swap_total,
+                }),
+                disks: host_facts.disks.clone(),
+                system: Some(SystemMessage {
+                    hostname: String::from(&host_facts.system.hostname),
+                })
             });
 
             client.send_live_metrics(request).await.unwrap();
