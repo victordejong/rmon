@@ -9,7 +9,6 @@ edition = "2021"
 chrono = "0.4.*"
 clap = { version = "4.5.*", features = ["derive"] }
 config = "0.14.*"
-exitcode = "1.1.*"
 procfs = "0.16.*"
 prost = "0.12.*"
 regex = "1.10.*"

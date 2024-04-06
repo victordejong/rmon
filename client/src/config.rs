@@ -1,6 +1,5 @@
 use clap::{Parser, arg, command};
 use regex::Regex;
-use exitcode;
 use config::{Config, File, Environment};
 use std::path::Path;
 use serde::Deserialize;
@@ -86,7 +85,7 @@ fn validate_hostname_port(hostname_port: &String) {
 
     if !re.is_match(hostname_port) {
         println!("Error: Hostname/port combination not expected: {}", hostname_port);
-        std::process::exit(exitcode::DATAERR);
+        std::process::exit(1);
     }
 
     return;
