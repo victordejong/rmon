@@ -7,22 +7,30 @@ service Greeter {
 
 message LiveMetricsMessage {
 
-    CpuMessage cpu = 1;
-    MemMessage mem = 2;
-    repeated string disks = 3;
-    SystemMessage system = 4;
+    LiveCpuMessage cpu = 1;
+    LiveMemMessage mem = 2;
+    repeated LiveDiskMessage disks = 3;
+    string hostname = 4;
 
-    message CpuMessage {
-        fixed64 cores = 1;
-        string vendor_id = 2;
-        string model_name = 3;
+    message LiveCpuMessage {
+        float freq = 1;
+        LiveCpuLoad cpu_load = 2;
     }
-    message MemMessage {
-        fixed64 ram_total = 1;
-        fixed64 swap_total = 2;
+    message LiveCpuLoad {
+        float load_1m = 1;
+        float load_5m = 2;
+        float load_15m = 3;
     }
-    message SystemMessage {
-        string hostname = 1;
+    message LiveMemMessage {
+        fixed64 free = 1;
+        fixed64 available = 2;
+        fixed64 cached = 3;
+    }
+    message LiveDiskMessage {
+        string name = 1;
+        fixed64 total_reads = 2;
+        fixed64 total_writes = 3;
+        fixed64 current_io = 4;
     }
 }
 
