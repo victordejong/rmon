@@ -11,6 +11,7 @@ use collectors::{cpu, mem, disk};
 
 mod transport;
 use transport::send_hostfacts::send_host_facts_to_remote;
+use transport::send_livemetrics::send_live_metrics_to_remote;
 
 mod data_structs;
 use data_structs::live_metrics::{init_live_metrics_struct, LiveMetrics};
@@ -69,6 +70,10 @@ async fn main() {
 
         if disks_configured {
             live_metrics = disk::collect(live_metrics);
+        }
+
+        if rhost_configured {
+            send_live_metrics_to_remote(&remote_host, &live_metrics, &host_facts.system.hostname).await;
         }
 
         print_to_console(&live_metrics, &host_facts);
