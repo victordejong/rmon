@@ -10,8 +10,13 @@ use tonic::Request;
 use crate::data_structs::live_metrics::LiveMetrics;
 
 pub async fn send_live_metrics_to_remote(remote_host: &String, live_metrics: &LiveMetrics, hostname: &String) {
-    let mut client = LiveMetricsGreeterClient::connect(format!("http://{}", remote_host)).await
-        .expect(&format!("ERROR: connection to server http://{} failed!", remote_host));
+    let mut client = match LiveMetricsGreeterClient::connect(format!("http://{}", remote_host)).await {
+        Ok(result) => result,
+        Err(e) => {
+            println!("ERROR: connection to server http://{} failed: {}", remote_host, e);
+            return;
+        }
+    };
 
     let mut output: LiveMetricsMessage = LiveMetricsMessage {
         cpu: Some(LiveCpuMessage {

@@ -10,8 +10,13 @@ use tonic::Request;
 use crate::data_structs::host_facts::HostFacts;
 
 pub async fn send_host_facts_to_remote(remote_host: &String, host_facts: &HostFacts) {
-    let mut client = HostFactsGreeterClient::connect(format!("http://{}", remote_host)).await
-        .expect(&format!("ERROR: connection to server http://{} failed!", remote_host));
+    let mut client = match HostFactsGreeterClient::connect(format!("http://{}", remote_host)).await {
+        Ok(result) => result,
+        Err(e) => {
+            println!("ERROR: connection to server http://{} failed: {}", remote_host, e);
+            return;
+        }
+    };
 
     let request: Request<HostFactsMessage> = tonic::Request::new(HostFactsMessage {
         cpu: Some(HostCpuMessage {
