@@ -1,7 +1,7 @@
 use tonic::{transport::Server, Request, Response, Status};
 use chrono::Local;
 
-use live_metrics_protobuf::greeter_server::{Greeter, GreeterServer};
+use live_metrics_protobuf::live_metrics_greeter_server::{LiveMetricsGreeter, LiveMetricsGreeterServer};
 use live_metrics_protobuf::{LiveMetricsMessage, LiveMetricsReply};
 
 use host_facts_protobuf::host_facts_greeter_server::{HostFactsGreeter, HostFactsGreeterServer};
@@ -14,13 +14,13 @@ pub mod host_facts_protobuf { tonic::include_proto!("hostfacts"); }
 mod printer;
 
 #[derive(Debug, Default)]
-pub struct LiveMetricsGreeter {}
+pub struct ServerLiveMetricsGreeter {}
 
 #[derive(Debug, Default)]
 pub struct ServerHostFactsGreeter {}
 
 #[tonic::async_trait]
-impl Greeter for LiveMetricsGreeter {
+impl LiveMetricsGreeter for ServerLiveMetricsGreeter {
     async fn send_live_metrics(
         &self,
         request: Request<LiveMetricsMessage>,
@@ -58,11 +58,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Starting RMON-Server on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
 
     let addr = "0.0.0.0:50051".parse()?;
-    let greeter = LiveMetricsGreeter::default();
+    let greeter = ServerLiveMetricsGreeter::default();
     let hostgreeter = ServerHostFactsGreeter::default();
 
     Server::builder()
-        .add_service(GreeterServer::new(greeter))
+        .add_service(LiveMetricsGreeterServer::new(greeter))
         .add_service(HostFactsGreeterServer::new(hostgreeter))
         .serve(addr)
         .await?;
