@@ -25,3 +25,7 @@ cd client
 cargo build --release
 cargo run --release        # Or simply run ./target/release/rmon-client
 ```
+
+## RMON-Server
+
+TODO
