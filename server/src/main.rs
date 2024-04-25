@@ -1,5 +1,4 @@
 use tonic::{transport::Server, Request, Response, Status};
-use chrono::Local;
 
 use live_metrics_protobuf::live_metrics_greeter_server::{LiveMetricsGreeter, LiveMetricsGreeterServer};
 use live_metrics_protobuf::{LiveMetricsMessage, LiveMetricsReply};
@@ -12,6 +11,7 @@ pub mod live_metrics_protobuf { tonic::include_proto!("livemetrics"); }
 pub mod host_facts_protobuf { tonic::include_proto!("hostfacts"); }
 
 mod printer;
+mod config;
 
 #[derive(Debug, Default)]
 pub struct ServerLiveMetricsGreeter {}
@@ -55,7 +55,8 @@ impl HostFactsGreeter for ServerHostFactsGreeter {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Starting RMON-Server on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
+
+    let config_struct: config::ConfigStruct = config::parse_config_sources();
 
     let addr = "0.0.0.0:50051".parse()?;
     let greeter = ServerLiveMetricsGreeter::default();
