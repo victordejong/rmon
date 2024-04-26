@@ -87,7 +87,7 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
         .build().unwrap().try_deserialize().unwrap();
 
     let mut final_config = ConfigStruct {
-        listen_host: None,
+        listen_host: Some(String::from(DEFAULT_LISTEN_HOST)),
     };
 
     final_config = override_variables(final_config, file_config);
@@ -102,7 +102,7 @@ fn override_variables<T: ConfigFields>(mut final_config: ConfigStruct, config: T
     // Configure RHOST
     match config.listen_host() {
         Some(hostname_port) => { final_config.listen_host = Some(String::from(hostname_port)); },
-        None => { final_config.listen_host = Some(String::from(DEFAULT_LISTEN_HOST)); },
+        None => (),
     };
 
     // Check RHOST validity

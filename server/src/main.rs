@@ -1,4 +1,5 @@
 use tonic::{transport::Server, Request, Response, Status};
+use std::net::ToSocketAddrs;
 
 use live_metrics_protobuf::live_metrics_greeter_server::{LiveMetricsGreeter, LiveMetricsGreeterServer};
 use live_metrics_protobuf::{LiveMetricsMessage, LiveMetricsReply};
@@ -58,9 +59,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let config_struct: config::ConfigStruct = config::parse_config_sources();
 
-    let addr = "0.0.0.0:50051".parse()?;
+//    println!("Started listening on {}", config_struct.listen_host.as_ref().unwrap());
+    let addr = config_struct.listen_host.as_ref().unwrap().to_socket_addrs().unwrap().next().unwrap();
+
     let greeter = ServerLiveMetricsGreeter::default();
     let hostgreeter = ServerHostFactsGreeter::default();
+
+    println!("Started listening on {}", config_struct.listen_host.as_ref().unwrap());
 
     Server::builder()
         .add_service(LiveMetricsGreeterServer::new(greeter))
