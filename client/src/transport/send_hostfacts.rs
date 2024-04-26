@@ -3,17 +3,21 @@ pub mod host_facts_protobuf {
 }
 
 use host_facts_protobuf::host_facts_greeter_client::HostFactsGreeterClient;
+use host_facts_protobuf::host_facts_message::{HostCpuMessage, HostMemMessage, HostSystemMessage};
 use host_facts_protobuf::HostFactsMessage;
-use host_facts_protobuf::host_facts_message::{HostCpuMessage,HostMemMessage,HostSystemMessage};
 use tonic::Request;
 
 use crate::data_structs::host_facts::HostFacts;
 
 pub async fn send_host_facts_to_remote(remote_host: &String, host_facts: &HostFacts) {
-    let mut client = match HostFactsGreeterClient::connect(format!("http://{}", remote_host)).await {
+    let mut client = match HostFactsGreeterClient::connect(format!("http://{}", remote_host)).await
+    {
         Ok(result) => result,
         Err(e) => {
-            println!("ERROR: connection to server http://{} failed: {}", remote_host, e);
+            println!(
+                "ERROR: connection to server http://{} failed: {}",
+                remote_host, e
+            );
             return;
         }
     };
@@ -31,7 +35,7 @@ pub async fn send_host_facts_to_remote(remote_host: &String, host_facts: &HostFa
         disks: host_facts.disks.clone(),
         system: Some(HostSystemMessage {
             hostname: String::from(&host_facts.system.hostname),
-        })
+        }),
     });
 
     client.send_host_facts(request).await.unwrap();

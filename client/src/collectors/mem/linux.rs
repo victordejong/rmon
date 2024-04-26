@@ -1,6 +1,6 @@
-use procfs::{Meminfo, Current};
-use crate::LiveMetrics;
 use crate::HostFacts;
+use crate::LiveMetrics;
+use procfs::{Current, Meminfo};
 
 pub fn get_mem_data(live_metrics_struct: &mut LiveMetrics) {
     let memstruct: Meminfo = match Meminfo::current() {

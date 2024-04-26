@@ -1,9 +1,8 @@
-use procfs::{CpuInfo, Current, LoadAverage};
-use crate::LiveMetrics;
 use crate::HostFacts;
+use crate::LiveMetrics;
+use procfs::{CpuInfo, Current, LoadAverage};
 
 pub fn get_cpu_data(live_metrics_struct: &mut LiveMetrics) {
-
     let cpustruct: CpuInfo = match CpuInfo::current() {
         Err(error) => panic!("Cannot get CpuInfo ProcFS struct: {}", error),
         Ok(result) => result,
@@ -13,7 +12,6 @@ pub fn get_cpu_data(live_metrics_struct: &mut LiveMetrics) {
 
     let mut total: f32 = 0.;
     for n in 0..cpu_cores {
-
         let core_speed: String = match CpuInfo::get_field(&cpustruct, n, "cpu MHz") {
             None => panic!("No current frequency value for CPU {}", n),
             Some(result) => String::from(result),
@@ -50,11 +48,11 @@ pub fn get_host_facts(host_facts_struct: &mut HostFacts) {
     };
 
     host_facts_struct.cpu.cores = CpuInfo::num_cores(&cpustruct);
-    host_facts_struct.cpu.vendor_id = match CpuInfo::vendor_id(&cpustruct, 0){
+    host_facts_struct.cpu.vendor_id = match CpuInfo::vendor_id(&cpustruct, 0) {
         None => panic!("No CPU 0, what does this even mean?"),
         Some(result) => String::from(result),
     };
-    host_facts_struct.cpu.model_name = match CpuInfo::model_name(&cpustruct, 0){
+    host_facts_struct.cpu.model_name = match CpuInfo::model_name(&cpustruct, 0) {
         None => panic!("No CPU 0, what does this even mean?"),
         Some(result) => String::from(result),
     };

@@ -1,16 +1,16 @@
-use clap::{Parser, arg, command};
-use regex::Regex;
-use config::{Config, File, Environment};
-use std::path::Path;
-use serde::Deserialize;
 use chrono::Local;
+use clap::{arg, command, Parser};
+use config::{Config, Environment, File};
+use regex::Regex;
+use serde::Deserialize;
+use std::path::Path;
 
 // Randomly picked interval
 // Guaranteed to be random, chosen by fair D12 dice roll
 const DEFAULT_INTERVAL: u64 = 10;
 const DEFAULT_CONFIG_PATH: &str = "/etc/rmon/rmon-client.yaml";
 
-/// RMON-Client: Remote MONitoring client. A simple tool for metrics monitoring. 
+/// RMON-Client: Remote MONitoring client. A simple tool for metrics monitoring.
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct CmdArgs {
@@ -34,7 +34,6 @@ pub struct CmdArgs {
 #[derive(Deserialize)]
 // #[allow(unused)]
 pub struct FileStruct {
-
     pub interval: Option<u64>,
 
     pub rhost: Option<String>,
@@ -57,22 +56,36 @@ trait ConfigFields {
 }
 
 impl ConfigFields for FileStruct {
-    fn interval(&self) -> Option<u64> { self.interval }
-    fn rhost(&self) -> &Option<String> { &self.rhost }
-    fn disks(&self) -> &Option<String> { &self.disks }
+    fn interval(&self) -> Option<u64> {
+        self.interval
+    }
+    fn rhost(&self) -> &Option<String> {
+        &self.rhost
+    }
+    fn disks(&self) -> &Option<String> {
+        &self.disks
+    }
 }
 
 impl ConfigFields for CmdArgs {
-    fn interval(&self) -> Option<u64> { self.interval }
-    fn rhost(&self) -> &Option<String> { &self.rhost }
-    fn disks(&self) -> &Option<String> { &self.disks }
+    fn interval(&self) -> Option<u64> {
+        self.interval
+    }
+    fn rhost(&self) -> &Option<String> {
+        &self.rhost
+    }
+    fn disks(&self) -> &Option<String> {
+        &self.disks
+    }
 }
 
 pub fn parse_config_sources() -> ConfigStruct {
-
     let cmd_args_struct: CmdArgs = CmdArgs::parse();
 
-    println!("Starting RMON-Client on {}", Local::now().format("%Y-%m-%dT%H:%M:%S%Z"));
+    println!(
+        "Starting RMON-Client on {}",
+        Local::now().format("%Y-%m-%dT%H:%M:%S%Z")
+    );
 
     let final_config = merge_config_sources(cmd_args_struct);
 
@@ -84,32 +97,42 @@ fn validate_hostname_port(hostname_port: &String) {
     let re: regex::Regex = Regex::new(r"^[a-z0-9-\.]+\:[0-9]{1,5}$").unwrap();
 
     if !re.is_match(hostname_port) {
-        println!("Error: Hostname/port combination not expected: {}", hostname_port);
+        println!(
+            "Error: Hostname/port combination not expected: {}",
+            hostname_port
+        );
         std::process::exit(1);
     }
 
     return;
 }
 
-
 // Priority is as follows (lower overrides higher):
 // 3. config on disk, 2. cmd line variables, 1. ENV variables
 fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
-
     // Print warning if given config file does not exist on disk
     if !Path::new(&cmd_args_struct.config).exists() {
-        println!("WARNING: configured config file {} does not exist!", &cmd_args_struct.config);
+        println!(
+            "WARNING: configured config file {} does not exist!",
+            &cmd_args_struct.config
+        );
     }
 
     // Build the config from disk (if applicable)
     let file_config: FileStruct = Config::builder()
         .add_source(File::from(Path::new(&cmd_args_struct.config)).required(false))
-        .build().unwrap().try_deserialize().unwrap();
+        .build()
+        .unwrap()
+        .try_deserialize()
+        .unwrap();
 
     // Build the config from possible present ENV variables
     let env_config: FileStruct = Config::builder()
         .add_source(Environment::with_prefix("rmon_client"))
-        .build().unwrap().try_deserialize().unwrap();
+        .build()
+        .unwrap()
+        .try_deserialize()
+        .unwrap();
 
     let mut final_config = ConfigStruct {
         interval: DEFAULT_INTERVAL,
@@ -125,28 +148,35 @@ fn merge_config_sources(cmd_args_struct: CmdArgs) -> ConfigStruct {
 }
 
 fn override_variables<T: ConfigFields>(mut final_config: ConfigStruct, config: T) -> ConfigStruct {
-
     // Configure interval
     match config.interval() {
-        Some(interval) => { final_config.interval = interval; }
+        Some(interval) => {
+            final_config.interval = interval;
+        }
         None => (),
     };
 
     // Configure RHOST
     match config.rhost() {
-        Some(hostname_port) => { final_config.rhost = Some(String::from(hostname_port)); },
+        Some(hostname_port) => {
+            final_config.rhost = Some(String::from(hostname_port));
+        }
         None => (),
     };
 
     // Check RHOST validity, if set
     match final_config.rhost {
-        Some(ref hostname_port) => {validate_hostname_port(&hostname_port);}
+        Some(ref hostname_port) => {
+            validate_hostname_port(&hostname_port);
+        }
         None => (),
     };
 
     // Configure disks
     match config.disks() {
-        Some(disks) => { final_config.disks = Some(parse_disks(String::from(disks))); },
+        Some(disks) => {
+            final_config.disks = Some(parse_disks(String::from(disks)));
+        }
         None => (),
     };
 
@@ -154,7 +184,10 @@ fn override_variables<T: ConfigFields>(mut final_config: ConfigStruct, config: T
 }
 
 fn parse_disks(disks: String) -> Vec<String> {
-    let split_disks: Vec<String> = disks.split(",").map(|s| String::from(s)).collect::<Vec<String>>();
+    let split_disks: Vec<String> = disks
+        .split(",")
+        .map(|s| String::from(s))
+        .collect::<Vec<String>>();
     let mut output: Vec<String> = vec![];
 
     for disk in split_disks.iter() {

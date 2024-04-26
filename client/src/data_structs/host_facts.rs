@@ -2,8 +2,7 @@
 Desciption: This struct holds all inventory facts for a host. The metrics this struct are collected once during startup
             and are considered static for the duration the program is expected to compute.
 */
-
-use crate::collectors::{cpu, mem, disk, system};
+use crate::collectors::{cpu, disk, mem, system};
 
 pub struct HostFacts {
     pub cpu: Cpu,
@@ -41,7 +40,7 @@ pub fn init_host_facts_struct() -> HostFacts {
         disks: vec![],
         system: System {
             hostname: String::new(),
-        }
+        },
     };
 
     host_facts = populate_host_facts_struct(host_facts);

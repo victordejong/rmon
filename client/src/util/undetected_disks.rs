@@ -1,8 +1,7 @@
-use crate::LiveMetrics;
 use crate::HostFacts;
+use crate::LiveMetrics;
 
 pub fn warn_undetected_disks(live_metrics_struct: &LiveMetrics, host_facts_struct: &HostFacts) {
-
     let mut detected: bool = false;
 
     for conf_disk in live_metrics_struct.disks.iter() {

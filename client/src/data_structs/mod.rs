@@ -1,2 +1,2 @@
-pub mod live_metrics;
 pub mod host_facts;
+pub mod live_metrics;

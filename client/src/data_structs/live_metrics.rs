@@ -40,7 +40,7 @@ pub fn init_live_metrics_struct(disks: &Option<Vec<String>>) -> LiveMetrics {
                 load_1m: 0.,
                 load_5m: 0.,
                 load_15m: 0.,
-            },            
+            },
         },
         mem: Mem {
             free: 0,
@@ -54,19 +54,15 @@ pub fn init_live_metrics_struct(disks: &Option<Vec<String>>) -> LiveMetrics {
         None => (),
         Some(conf_disks) => {
             for disk in conf_disks.iter() {
-                live_metrics_struct.disks.push(
-                    Disk {
-                        name: String::from(disk),
-                        total_reads: 0,
-                        total_writes: 0,
-                        current_io: 0,
-                    }
-                );
+                live_metrics_struct.disks.push(Disk {
+                    name: String::from(disk),
+                    total_reads: 0,
+                    total_writes: 0,
+                    current_io: 0,
+                });
             }
         }
     }
-
-    
 
     return live_metrics_struct;
 }

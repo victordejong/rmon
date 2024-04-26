@@ -1,6 +1,6 @@
-use procfs::{DiskStat, DiskStats, Current};
-use crate::LiveMetrics;
 use crate::HostFacts;
+use crate::LiveMetrics;
+use procfs::{Current, DiskStat, DiskStats};
 
 pub fn get_disk_stats(live_metrics_struct: &mut LiveMetrics) {
     let system_disks: Vec<DiskStat> = match DiskStats::current() {
