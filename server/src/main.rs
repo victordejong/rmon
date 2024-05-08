@@ -1,3 +1,5 @@
+use rusqlite::Connection;
+use std::env;
 use std::net::ToSocketAddrs;
 use tonic::{transport::Server, Request, Response, Status};
 
@@ -18,7 +20,10 @@ pub mod host_facts_protobuf {
 }
 
 mod config;
+mod db;
 mod printer;
+
+static mut CONN: Option<Connection> = None;
 
 #[derive(Debug, Default)]
 pub struct ServerLiveMetricsGreeter {}
@@ -32,7 +37,6 @@ impl LiveMetricsGreeter for ServerLiveMetricsGreeter {
         &self,
         request: Request<LiveMetricsMessage>,
     ) -> Result<Response<LiveMetricsReply>, Status> {
-        //println!("Got a request: {:?}", request);
         printer::livemetrics_printer::print_received_live_metrics(&request);
 
         let reply = live_metrics_protobuf::LiveMetricsReply { success: true };
@@ -47,8 +51,11 @@ impl HostFactsGreeter for ServerHostFactsGreeter {
         &self,
         request: Request<HostFactsMessage>,
     ) -> Result<Response<HostFactsReply>, Status> {
-        //println!("Got a request: {:?}", request);
         printer::hostfacts_printer::print_received_host_facts(&request);
+
+        unsafe {
+            db::insert_host_fact(CONN.as_mut().unwrap(), &request);
+        }
 
         let reply = host_facts_protobuf::HostFactsReply { success: true };
 
@@ -59,6 +66,14 @@ impl HostFactsGreeter for ServerHostFactsGreeter {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config_struct: config::ConfigStruct = config::parse_config_sources();
+
+    let path: String = env::current_dir()?.display().to_string();
+    println!("Initializing SQLite DB in {}...", &path);
+
+    // TODO: Avoid using unsafe and/or global vars?
+    unsafe {
+        CONN = Some(db::initialise_database(path));
+    }
 
     //    println!("Started listening on {}", config_struct.listen_host.as_ref().unwrap());
     let addr = config_struct
