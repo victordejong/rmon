@@ -1,7 +1,6 @@
-use rusqlite::Connection;
-use rusqlite::config::DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY;
 use chrono::Local;
-
+use rusqlite::config::DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY;
+use rusqlite::Connection;
 
 use crate::host_facts_protobuf;
 use crate::live_metrics_protobuf;
@@ -15,7 +14,8 @@ pub fn initialise_database(path: String) -> Connection {
     db_name.push_str("database.db");
     let conn = Connection::open(&db_name).unwrap();
 
-    conn.set_db_config(SQLITE_DBCONFIG_ENABLE_FKEY, true).unwrap();
+    conn.set_db_config(SQLITE_DBCONFIG_ENABLE_FKEY, true)
+        .unwrap();
 
     conn.execute(
         "create table if not exists host_facts (
