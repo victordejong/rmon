@@ -40,6 +40,8 @@ impl LiveMetricsGreeter for ServerLiveMetricsGreeter {
     ) -> Result<Response<LiveMetricsReply>, Status> {
         printer::livemetrics_printer::print_received_live_metrics(&request);
 
+        db::insert_live_metrics(CONN.lock().unwrap().as_mut().unwrap(), &request);
+
         let reply = live_metrics_protobuf::LiveMetricsReply { success: true };
 
         Ok(Response::new(reply))
@@ -67,7 +69,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config_struct: config::ConfigStruct = config::parse_config_sources();
 
     let path: String = env::current_dir()?.display().to_string();
-    println!("Initializing SQLite DB in {}...", &path);
+    println!("Initializing SQLite DB in {}/database.db...", &path);
 
     let mut local_mut_conn = CONN.lock().unwrap();
     *local_mut_conn = Some(db::initialise_database(path));
