@@ -11,7 +11,12 @@ pub fn initialise_database(path: String) -> Connection {
 
     conn.execute(
         "create table if not exists host_metrics (
-             name text primary key
+            hostname TEST PRIMARY KEY,
+            cores INTEGER NOT NULL,
+            vendor_id TEXT NOT NULL,
+            model_name TEXT NOT NULL,
+            ram_total INTEGER NOT NULL,
+            swap_total INTEGER NOT NULL
          )",
         (),
     )
@@ -25,9 +30,21 @@ pub fn insert_host_fact(conn: &mut Connection, request: &Request<HostFactsMessag
 
     let tx = conn.transaction().unwrap();
 
+    // TODO: insert disk facts
     tx.execute(
-        "INSERT INTO host_metrics (name) values (?1)",
-        [&request_message.system.as_ref().unwrap().hostname],
+        "INSERT OR REPLACE INTO
+        host_metrics
+        (hostname, cores, vendor_id, model_name, ram_total, swap_total)
+        VALUES
+        (?1, ?2, ?3, ?4, ?5, ?6)",
+        [
+            &request_message.system.as_ref().unwrap().hostname,
+            &request_message.cpu.as_ref().unwrap().cores.to_string(),
+            &request_message.cpu.as_ref().unwrap().vendor_id,
+            &request_message.cpu.as_ref().unwrap().model_name,
+            &request_message.mem.as_ref().unwrap().ram_total.to_string(),
+            &request_message.mem.as_ref().unwrap().swap_total.to_string(),
+        ],
     )
     .unwrap();
 
