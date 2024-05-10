@@ -1,4 +1,5 @@
 use rusqlite::Connection;
+use rusqlite::config::DbConfig::SQLITE_DBCONFIG_ENABLE_FKEY;
 use chrono::Local;
 
 
@@ -13,6 +14,8 @@ pub fn initialise_database(path: String) -> Connection {
     db_name.push_str("/");
     db_name.push_str("database.db");
     let conn = Connection::open(&db_name).unwrap();
+
+    conn.set_db_config(SQLITE_DBCONFIG_ENABLE_FKEY, true).unwrap();
 
     conn.execute(
         "create table if not exists host_facts (
@@ -37,8 +40,21 @@ pub fn initialise_database(path: String) -> Connection {
             cpu_load_15m REAL NOT NULL,
             mem_free INTEGER NOT NULL,
             mem_avail INTEGER NOT NULL,
-            mem_cached INTEGER NOT NULL
+            mem_cached INTEGER NOT NULL,
+            FOREIGN KEY (hostname) REFERENCES host_facts (hostname)
          )",
+        (),
+    )
+    .unwrap();
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS hostname ON host_facts(hostname)",
+        (),
+    )
+    .unwrap();
+
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS timestamp ON live_metrics(timestamp)",
         (),
     )
     .unwrap();
