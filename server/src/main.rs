@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 use std::env;
 use std::net::ToSocketAddrs;
+use std::sync::Mutex;
 use tonic::{transport::Server, Request, Response, Status};
 
 use live_metrics_protobuf::live_metrics_greeter_server::{
@@ -23,7 +24,7 @@ mod config;
 mod db;
 mod printer;
 
-static mut CONN: Option<Connection> = None;
+static CONN: Mutex<Option<Connection>> = Mutex::new(None);
 
 #[derive(Debug, Default)]
 pub struct ServerLiveMetricsGreeter {}
@@ -53,9 +54,7 @@ impl HostFactsGreeter for ServerHostFactsGreeter {
     ) -> Result<Response<HostFactsReply>, Status> {
         printer::hostfacts_printer::print_received_host_facts(&request);
 
-        unsafe {
-            db::insert_host_fact(CONN.as_mut().unwrap(), &request);
-        }
+        db::insert_host_fact(CONN.lock().unwrap().as_mut().unwrap(), &request);
 
         let reply = host_facts_protobuf::HostFactsReply { success: true };
 
@@ -70,10 +69,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let path: String = env::current_dir()?.display().to_string();
     println!("Initializing SQLite DB in {}...", &path);
 
-    // TODO: Avoid using unsafe and/or global vars?
-    unsafe {
-        CONN = Some(db::initialise_database(path));
-    }
+    let mut local_mut_conn = CONN.lock().unwrap();
+    *local_mut_conn = Some(db::initialise_database(path));
+    drop(local_mut_conn);
 
     //    println!("Started listening on {}", config_struct.listen_host.as_ref().unwrap());
     let addr = config_struct
