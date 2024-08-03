@@ -21,9 +21,6 @@
           failed_when: false
           register: protoc_result
 
-        - debug:
-            msg: "{{ cc_result }}"
-
         - assert:
             that: cargo_result.rc == 0
             fail_msg: "You're trying to install from source, but the Rust toolchain is not installed. Please install the Rust toolchain: https://www.rust-lang.org/tools/install"
