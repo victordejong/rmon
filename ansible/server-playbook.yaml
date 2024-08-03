@@ -9,31 +9,46 @@
     - name: Verify build requirements
       tags: install-src
       block:
-        - command: cargo --version
+        - name: Query if "cargo" is available
+          command: cargo --version
+          changed_when: false
           failed_when: false
           register: cargo_result
 
-        - shell: command -v cc
+        - name: Query if "cc" is available
+          shell: command -v cc
+          changed_when: false
           failed_when: false
           register: cc_result
 
-        - shell: command -v protoc
+        - name: Query if "protoc" is available
+          shell: command -v protoc
+          changed_when: false
           failed_when: false
           register: protoc_result
 
-        - assert:
+        - name: Verify if "cargo" is available
+          assert:
             that: cargo_result.rc == 0
-            fail_msg: "You're trying to install from source, but the Rust toolchain is not installed. Please install the Rust toolchain: https://www.rust-lang.org/tools/install"
+            fail_msg: |
+              You're trying to install from source, but the Rust toolchain is not installed.
+              Please install the Rust toolchain: https://www.rust-lang.org/tools/install
             success_msg: "The Rust toolchain is installed!"
 
-        - assert:
+        - name: Verify if "cc" is available
+          assert:
             that: cc_result.rc == 0
-            fail_msg: "You're trying to install from source, but the toolchain to build source code is not installed. Please install them, see the README.md for more information."
+            fail_msg: |
+              You're trying to install from source, but the toolchain to build source code is not installed.
+              Please install them, see the README.md for more information.
             success_msg: "Build essentials are installed!"
 
-        - assert:
+        - name: Verify if "protoc" is available
+          assert:
             that: protoc_result.rc == 0
-            fail_msg: "You're trying to install from source, but the toolchain to build protobufs is not installed. Please install them, see the README.md for more information."
+            fail_msg: |
+              You're trying to install from source, but the toolchain to build protobufs is not installed.
+              Please install them, see the README.md for more information.
             success_msg: "The protobuf compiler is installed!"
 
     - name: Build binary from source
