@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -exo pipefail
+set -eo pipefail
 
 ######### VARIABLES #########
 INSTALL_DIR="/opt/rmon"

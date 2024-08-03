@@ -1,0 +1,136 @@
+---
+
+- name: Install scripts for the RMON-Server
+  hosts: all
+  gather_facts: true
+
+  tasks:
+
+    - name: Verify build requirements
+      tags: install-src
+      block:
+        - command: cargo --version
+          failed_when: false
+          register: cargo_result
+
+        - shell: command -v cc
+          failed_when: false
+          register: cc_result
+
+        - shell: command -v protoc
+          failed_when: false
+          register: protoc_result
+
+        - debug:
+            msg: "{{ cc_result }}"
+
+        - assert:
+            that: cargo_result.rc == 0
+            fail_msg: "You're trying to install from source, but the Rust toolchain is not installed. Please install the Rust toolchain: https://www.rust-lang.org/tools/install"
+            success_msg: "The Rust toolchain is installed!"
+
+        - assert:
+            that: cc_result.rc == 0
+            fail_msg: "You're trying to install from source, but the toolchain to build source code is not installed. Please install them, see the README.md for more information."
+            success_msg: "Build essentials are installed!"
+
+        - assert:
+            that: protoc_result.rc == 0
+            fail_msg: "You're trying to install from source, but the toolchain to build protobufs is not installed. Please install them, see the README.md for more information."
+            success_msg: "The protobuf compiler is installed!"
+
+    - name: Build binary from source
+      command:
+        cmd: cargo build --release
+        chdir: /tmp/rmon-installer/rmon/server
+        creates: /tmp/rmon-installer/rmon/server/target/release/rmon-server
+      tags: install-src
+
+    - name: Copy src build to installer directory
+      copy:
+        src: /tmp/rmon-installer/rmon/server/target/release/rmon-server
+        dest: /tmp/rmon-installer/rmon-server
+        mode: '0755'
+        remote_src: true
+      tags: install-src
+
+    - name: Create rmon system user
+      user:
+        name: rmon
+        comment: System user for the RMON suite
+        system: true
+      become: true
+      tags:
+        - install
+        - install-src
+
+    - name: Create target configuration directory /etc/rmon
+      file:
+        path: /etc/rmon
+        owner: root
+        group: rmon
+        mode: '0750'
+        state: directory
+      become: true
+      tags:
+        - install
+        - install-src
+
+    - name: Create target installation directory /opt/rmon/bin
+      file:
+        path: /opt/rmon/bin
+        owner: rmon
+        group: rmon
+        mode: '0755'
+        state: directory
+      become: true
+      tags:
+        - install
+        - install-src
+
+    - name: Copy binary to target installation directory
+      copy:
+        src: /tmp/rmon-installer/rmon-server
+        dest: /opt/rmon/bin/rmon-server
+        remote_src: true
+        owner: rmon
+        group: rmon
+        mode: '0755'
+      become: true
+      tags:
+        - install
+        - install-src
+
+    - name: Copy default config to target config directory
+      copy:
+        src: rmon-server.yaml
+        dest: /etc/rmon/rmon-server.yaml
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+      tags:
+        - install
+        - install-src
+
+    - name: Copy systemd unit file
+      copy:
+        src: rmon-server.service
+        dest: /usr/lib/systemd/system/rmon-server.service
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+      notify: Start and enable rmon-server
+      tags:
+        - install
+        - install-src
+
+  handlers:
+    - name: Start and enable rmon-server
+      systemd:
+        name: rmon-server
+        enabled: true
+        state: started
+        daemon_reload: true
+      become: true

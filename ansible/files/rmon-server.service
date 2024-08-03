@@ -1,0 +1,11 @@
+[Unit]
+Description=Remote MONitoring client. A simple tool for metrics monitoring.
+
+[Service]
+WorkingDirectory=/opt/rmon
+User=rmon
+Group=rmon
+ExecStart=/opt/rmon/bin/rmon-server -c /etc/rmon/rmon-server.yaml
+
+[Install]
+WantedBy=multi-user.target
