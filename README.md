@@ -2,6 +2,16 @@
 
 Remote MONitoring, a system monitoring tool written in Rust.
 
+# Installation
+
+Run `rmon-installer.sh` with supported arguments:
+
+```bash
+./rmon-installer.sh [install | uninstall | install-src] [client | server]
+```
+
+(Currently only `install-src server`) is supported.
+
 ## Scope of this project
 
 - [x] Client monitoring tool
