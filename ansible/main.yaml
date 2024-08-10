@@ -1,13 +1,16 @@
 ---
 
-- name: Install scripts for the RMON-Server
+- name: "Install scripts for the RMON-{{ variant }}"
   hosts: all
   gather_facts: true
+
+  vars:
+    variant: ~
 
   tasks:
 
     - name: Check if the rust toolchain is installed
-      shell: command -v cargo
+      command: which cargo
       changed_when: false
       tags: install-src
 
@@ -20,17 +23,17 @@
       become: true
       tags: install-src
 
-    - name: Build binary from source
+    - name: "Build {{ variant }} binary from source"
       command:
         cmd: cargo build --release
-        chdir: /tmp/rmon-installer/rmon/server
-        creates: /tmp/rmon-installer/rmon/server/target/release/rmon-server
+        chdir: "/tmp/rmon-installer/rmon/{{ variant }}"
+        creates: /tmp/rmon-installer/rmon/{{ variant }}/target/release/rmon-{{ variant }}
       tags: install-src
 
-    - name: Copy src build to installer directory
+    - name: "Copy {{ variant }} src build to installer directory"
       copy:
-        src: /tmp/rmon-installer/rmon/server/target/release/rmon-server
-        dest: /tmp/rmon-installer/rmon-server
+        src: /tmp/rmon-installer/rmon/{{ variant }}/target/release/rmon-{{ variant }}
+        dest: /tmp/rmon-installer/rmon-{{ variant }}
         mode: '0755'
         remote_src: true
       tags: install-src
@@ -69,10 +72,10 @@
         - install
         - install-src
 
-    - name: Copy binary to target installation directory
+    - name: "Copy {{ variant }} binary to target installation directory"
       copy:
-        src: /tmp/rmon-installer/rmon-server
-        dest: /opt/rmon/bin/rmon-server
+        src: "/tmp/rmon-installer/rmon-{{ variant }}"
+        dest: "/opt/rmon/bin/rmon-{{ variant }}"
         remote_src: true
         owner: rmon
         group: rmon
@@ -82,10 +85,10 @@
         - install
         - install-src
 
-    - name: Copy default config to target config directory
+    - name: "Copy the {{ variant }} default config to target config directory"
       copy:
-        src: rmon-server.yaml
-        dest: /etc/rmon/rmon-server.yaml
+        src: "rmon-{{ variant }}.yaml"
+        dest: "/etc/rmon/rmon-{{ variant }}.yaml"
         owner: root
         group: root
         mode: '0644'
@@ -94,23 +97,23 @@
         - install
         - install-src
 
-    - name: Copy systemd unit file
-      copy:
-        src: rmon-server.service
-        dest: /usr/lib/systemd/system/rmon-server.service
+    - name: "Copy {{ variant }} systemd unit file"
+      template:
+        src: rmon.service
+        dest: "/usr/lib/systemd/system/rmon-{{ variant }}.service"
         owner: root
         group: root
         mode: '0644'
       become: true
-      notify: Start and enable rmon-server
+      notify: "Start and enable rmon-{{ variant }}"
       tags:
         - install
         - install-src
 
   handlers:
-    - name: Start and enable rmon-server
+    - name: "Start and enable rmon-{{ variant }}"
       systemd:
-        name: rmon-server
+        name: "rmon-{{ variant }}"
         enabled: true
         state: started
         daemon_reload: true

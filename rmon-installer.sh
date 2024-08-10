@@ -52,7 +52,7 @@ run () {
     ve python3
 
     # Run client-playbook.yaml or server-playbook.yaml
-    ansible-playbook --connection=local -i localhost, -t "${1}" "${2}"-playbook.yaml
+    ansible-playbook --connection=local -i localhost, -t "${1}" main.yaml -e variant="${2}"
 
 }
 #############################
