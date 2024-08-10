@@ -28,7 +28,6 @@ ve() {
             source "./.venv/bin/activate"
         fi
         ${py} -m pip install --upgrade pip
-        echo "$(pwd)"
         pip install -U -r requirements.txt
     else
         echo "Already in a virtual environment!"
@@ -49,7 +48,7 @@ run () {
     (git clone "${SRC_REMOTE}" || true) && cd "${SCRIPT_WORKDIR}"/rmon/ansible
 
     # Activate venv
-    ve python3
+    ve python3 > /dev/null 2>&1
 
     # Run client-playbook.yaml or server-playbook.yaml
     ansible-playbook --connection=local -i localhost, -t "${1}" main.yaml -e variant="${2}"
