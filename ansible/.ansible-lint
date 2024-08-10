@@ -1,0 +1,4 @@
+---
+# Ansible-lint does not fail on warnings from the rules or tags listed below
+skip_list:
+  - fqcn[action-core]
