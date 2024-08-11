@@ -10,7 +10,7 @@ Run `rmon-installer.sh` with supported arguments:
 ./rmon-installer.sh [install | uninstall | install-src] [client | server]
 ```
 
-(Currently only `install-src server`) is supported.
+(Currently only `install-src`) is supported.
 
 ## Scope of this project
 
