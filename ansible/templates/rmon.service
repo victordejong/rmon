@@ -2,10 +2,10 @@
 Description=Remote MONitoring {{ variant }}. A simple tool for metrics monitoring.
 
 [Service]
-WorkingDirectory=/opt/rmon
+WorkingDirectory={{ install_dir }}
 User=rmon
 Group=rmon
-ExecStart=/opt/rmon/bin/rmon-{{ variant }} -c /etc/rmon/rmon-{{ variant }}.yaml
+ExecStart={{ install_dir }}/bin/rmon-{{ variant }} -c /etc/rmon/rmon-{{ variant }}.yaml
 
 [Install]
 WantedBy=multi-user.target

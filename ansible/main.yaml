@@ -60,9 +60,9 @@
         - install
         - install-src
 
-    - name: Create target installation directory /opt/rmon/bin
+    - name: "Create target installation directory {{ install_dir }}/bin"
       file:
-        path: /opt/rmon/bin
+        path: "{{ install_dir }}/bin"
         owner: rmon
         group: rmon
         mode: '0755'
@@ -75,7 +75,7 @@
     - name: "Copy {{ variant }} binary to target installation directory"
       copy:
         src: "/tmp/rmon-installer/rmon-{{ variant }}"
-        dest: "/opt/rmon/bin/rmon-{{ variant }}"
+        dest: "{{ install_dir }}/bin/rmon-{{ variant }}"
         remote_src: true
         owner: rmon
         group: rmon
