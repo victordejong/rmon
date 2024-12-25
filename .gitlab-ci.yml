@@ -111,8 +111,10 @@ release:
     assets:
       links:
         - name: 'client-bin'
+          filepath: /releases/client-bin
           url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/client-bin.tar"
         - name: 'server-bin'
+          filepath: /releases/server-bin
           url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/server-bin.tar"
 
 sast:
