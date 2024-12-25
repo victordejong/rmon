@@ -53,7 +53,7 @@ rust-build:client:
       - client/target/release/
   rules:
     - changes:
-      - client/
+      - client/**/*
 
 rust-build:server:
   extends: .rust-build
@@ -65,7 +65,7 @@ rust-build:server:
       - server/target/release/
   rules:
     - changes:
-      - server/
+      - server/**/*
 
 publish-artifacts:client:
   stage: publish
