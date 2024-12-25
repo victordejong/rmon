@@ -4,9 +4,11 @@
 set -eo pipefail
 
 ######### VARIABLES #########
-INSTALL_DIR="/opt/rmon"
-SCRIPT_WORKDIR="/tmp/rmon-installer"
-SRC_REMOTE="https://gitlab.com/victordejong/rmon.git"
+export INSTALL_DIR="/opt/rmon"
+export SCRIPT_WORKDIR="/tmp/rmon-installer"
+export SRC_REMOTE="https://gitlab.com/victordejong/rmon.git"
+# Check installer requirements
+export SCRIPT_REQ="python python3-venv git"
 #############################
 
 
@@ -44,7 +46,6 @@ script_help () {
 
 run () {
     (mkdir -p "${SCRIPT_WORKDIR}" || true) && cd "${SCRIPT_WORKDIR}"
-
     (git clone "${SRC_REMOTE}" || true) && cd "${SCRIPT_WORKDIR}"/rmon/ansible
 
     # Activate venv
@@ -60,36 +61,28 @@ run () {
 # Validate requirements, arguments and run run()
 main () {
 
-    # Check installer requirements
-    SCRIPT_REQ="python python3-venv git"
-
     # shellcheck disable=SC2086
     command -v ${SCRIPT_REQ} > /dev/null 2>&1
 
     case ${1} in
-
         "install" | "uninstall" | "install-src")
             true
         ;;
-
         *)
             script_help
         ;;
     esac
 
     case ${2} in
-
         "client" | "server")
             true
         ;;
-
         *)
             script_help
         ;;
     esac
 
     run "${@}"
-
     exit 0
 }
 
