@@ -76,11 +76,10 @@ publish-artifacts:client:
   rules:
     - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
   script:
-    - tar -cf release-client.tar client/target/release/
     - |
       curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-           --upload-file release-client.tar \
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/client-bin.tar"
+           --upload-file client/target/release/rmon-client \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/rmon-client"
 
 publish-artifacts:server:
   stage: publish
@@ -91,11 +90,10 @@ publish-artifacts:server:
   rules:
     - if: $CI_COMMIT_TAG                  # Run this job when a tag is created manually
   script:
-    - tar -cf release-server.tar server/target/release/
     - |
       curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
-           --upload-file release-server.tar \
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/server-bin.tar"
+           --upload-file server/target/release/rmon-server \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/rmon-server"
 
 release:
   stage: release
@@ -110,12 +108,12 @@ release:
     description: 'Release created using the release-cli.'
     assets:
       links:
-        - name: 'client-bin'
-          filepath: /releases/client-bin
-          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/client-bin.tar"
-        - name: 'server-bin'
-          filepath: /releases/server-bin
-          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/server-bin.tar"
+        - name: 'rmon-client'
+          filepath: /releases/rmon-client
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/rmon-client"
+        - name: 'rmon-server'
+          filepath: /releases/rmon-server
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/rmon-server"
 
 sast:
   stage: test
