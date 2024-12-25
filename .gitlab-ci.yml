@@ -80,7 +80,7 @@ publish-artifacts:client:
     - |
       curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
            --upload-file release-client.tar \
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/release-client.tar"
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/client-bin.tar"
 
 publish-artifacts:server:
   stage: publish
@@ -95,7 +95,7 @@ publish-artifacts:server:
     - |
       curl --location --header "JOB-TOKEN: ${CI_JOB_TOKEN}" \
            --upload-file release-server.tar \
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/release-server.tar"
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/server-bin.tar"
 
 release:
   stage: release
@@ -108,6 +108,12 @@ release:
     tag_name: $CI_COMMIT_TAG
     name: 'Release $CI_COMMIT_TAG'
     description: 'Release created using the release-cli.'
+    assets:
+      links:
+        - name: 'client-bin'
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/client-bin.tar"
+        - name: 'server-bin'
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/rmon/${CI_COMMIT_TAG}/server-bin.tar"
 
 sast:
   stage: test
