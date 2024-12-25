@@ -50,6 +50,9 @@ rust-build:client:
   artifacts:
     paths:
       - client/target/release/
+  rules:
+    - changes:
+      - client/
 
 rust-build:server:
   extends: .rust-build
@@ -59,6 +62,9 @@ rust-build:server:
   artifacts:
     paths:
       - server/target/release/
+  rules:
+    - changes:
+      - server/
 
 release:
   stage: release
