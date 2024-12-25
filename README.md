@@ -4,6 +4,11 @@ Remote MONitoring, a system monitoring tool written in Rust.
 
 # Installation
 
+Requirements before installation:
+ * Python3
+ * Python3-venv
+ * git
+
 Run `rmon-installer.sh` with supported arguments:
 
 ```bash
