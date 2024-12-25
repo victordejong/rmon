@@ -7,6 +7,7 @@ set -eo pipefail
 export INSTALL_DIR="/opt/rmon"
 export SCRIPT_WORKDIR="/tmp/rmon-installer"
 export SRC_REMOTE="https://gitlab.com/victordejong/rmon.git"
+export RELEASE_TAG="permalink/latest"
 # Check installer requirements
 export SCRIPT_REQ="python python3-venv git"
 #############################
@@ -53,7 +54,7 @@ run () {
 
     # Run client-playbook.yaml or server-playbook.yaml
     ansible-playbook --connection=local -i localhost, -t "${1}" main.yaml \
-    -e variant="${2}" -e install_dir="${INSTALL_DIR}"
+    -e variant="${2}" -e install_dir="${INSTALL_DIR}" -e release_tag="${RELEASE_TAG}"
 
 }
 #############################
