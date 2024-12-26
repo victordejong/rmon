@@ -26,6 +26,22 @@ stages:
     access: 'developer'
     expire_in: "30 days"
 
+yamllint:
+  stage: lint
+  image:
+    name: cytopia/yamllint
+    entrypoint: ["/bin/ash", "-c"]
+  script:
+    - cd ansible
+    - yamllint -f colored .
+
+ansible-lint:
+  stage: lint
+  image: registry.gitlab.com/pipeline-components/ansible-lint:latest
+  script:
+    - cd ansible
+    - ansible-lint
+
 rust-check:client:
   extends: .rust-check
   script:
