@@ -1,0 +1,25 @@
+---
+- name: Check if the rust toolchain is installed
+  command: which cargo
+  changed_when: false
+
+- name: Install build requirements
+  apt:
+    pkg:
+      - build-essential
+      - protobuf-compiler
+    update_cache: true
+  become: true
+
+- name: "Build {{ variant }} binary from source"
+  command:
+    cmd: cargo build --release
+    chdir: "/tmp/rmon-installer/rmon/{{ variant }}"
+    creates: /tmp/rmon-installer/rmon/{{ variant }}/target/release/rmon-{{ variant }}
+
+- name: "Copy {{ variant }} src build to installer directory"
+  copy:
+    src: /tmp/rmon-installer/rmon/{{ variant }}/target/release/rmon-{{ variant }}
+    dest: /tmp/rmon-installer/rmon-{{ variant }}
+    mode: '0755'
+    remote_src: true
