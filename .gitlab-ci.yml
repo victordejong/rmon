@@ -42,6 +42,12 @@ ansible-lint:
     - cd ansible
     - ansible-lint
 
+shellcheck:
+  stage: lint
+  image: koalaman/shellcheck-alpine
+  script:
+    - find . -name "*.sh" -type f | xargs shellcheck
+
 rust-check:client:
   extends: .rust-check
   script:
