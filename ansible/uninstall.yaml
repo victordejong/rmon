@@ -1,0 +1,42 @@
+---
+
+- name: "Stop and disable rmon-{{ variant }}"
+  systemd:
+    name: "rmon-{{ variant }}"
+    enabled: false
+    state: stopped
+
+- name: "Remove the rmon-{{ variant }} systemd unit file"
+  file:
+    path: "/usr/lib/systemd/system/rmon-{{ variant }}.service"
+    state: absent
+  notify: Reload systemd
+
+- name: "Remove the rmon-{{ variant }} configuration file"
+  file:
+    path: "/etc/rmon/rmon-{{ variant }}.yaml"
+    state: absent
+
+- name: "Remove the rmon-{{ variant }} binary"
+  file:
+    path: "{{ install_dir }}/bin/rmon-{{ variant }}"
+    state: absent
+
+- name: "Remove the rmon shared directory"
+  file:
+    path: "{{ install_dir }}"
+    state: absent
+  tags: uninstall-full
+
+- name: "Remove the rmon configuration directory"
+  file:
+    path: /etc/rmon
+    state: absent
+  tags: uninstall-full
+
+- name: Create rmon system user
+  user:
+    name: rmon
+    state: absent
+    remove: true
+  tags: uninstall-full

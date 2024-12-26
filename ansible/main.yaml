@@ -95,11 +95,23 @@
         - install
         - install-src
 
+    - name: Import uninstall tasks
+      import_tasks: uninstall.yaml
+      become: true
+      tags:
+        - uninstall
+        - uninstall-full
+
   handlers:
     - name: "Start and enable rmon-{{ variant }}"
       systemd:
         name: "rmon-{{ variant }}"
         enabled: true
         state: started
+        daemon_reload: true
+      become: true
+
+    - name: Reload systemd
+      systemd:
         daemon_reload: true
       become: true
