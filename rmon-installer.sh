@@ -58,8 +58,14 @@ run () {
     # Activate venv
     ve python3 > /dev/null 2>&1
 
+    NEED_BECOME_PASS=""
+    # Check for root user and whether we need to ask for a become password
+    if [ "${USER}" != "root" ]; then
+        NEED_BECOME_PASS="--ask-become-pass"
+    fi
+
     # Run client-playbook.yaml or server-playbook.yaml
-    ansible-playbook --connection=local -i localhost, -t "${1}" main.yaml \
+    ansible-playbook ${NEED_BECOME_PASS} --connection=local -i localhost, -t "${1}" main.yaml \
     -e variant="${2}" -e install_dir="${INSTALL_DIR}" -e release_tag="${RELEASE_TAG}"
 
 }
