@@ -51,7 +51,7 @@ script_help () {
 
 run () {
     (mkdir -p "${SCRIPT_WORKDIR}" || true) && cd "${SCRIPT_WORKDIR}"
-    (git clone "${SRC_REMOTE}" || true) && cd "${SCRIPT_WORKDIR}"/rmon/ansible
+    (git clone "${SRC_REMOTE}" || (cd rmon && git pull && cd ..)) && cd "${SCRIPT_WORKDIR}"/rmon/ansible
 
     # Activate venv
     ve python3 > /dev/null 2>&1
