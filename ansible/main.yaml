@@ -102,6 +102,12 @@
         - uninstall
         - uninstall-full
 
+    - name: Import uninstall-full tasks
+      import_tasks: uninstall-full.yaml
+      become: true
+      tags:
+        - uninstall-full
+
   handlers:
     - name: "Start and enable rmon-{{ variant }}"
       systemd:

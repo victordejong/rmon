@@ -1,0 +1,20 @@
+---
+
+- name: "Remove the rmon shared directory"
+  file:
+    path: "{{ install_dir }}"
+    state: absent
+  tags: uninstall-full
+
+- name: "Remove the rmon configuration directory"
+  file:
+    path: /etc/rmon
+    state: absent
+  tags: uninstall-full
+
+- name: Remove the rmon system user
+  user:
+    name: rmon
+    state: absent
+    remove: true
+  tags: uninstall-full

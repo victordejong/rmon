@@ -40,7 +40,11 @@ ve() {
 script_help () {
     echo "
         Unsupported argument. The following arguments are supported:
-        ${0} [install | uninstall | install-src] [client | server]
+        ${0} [install | uninstall | uninstall-full | install-src] [client | server]
+
+        Use 'uninstall-full' to remove all traces from your system. Use this
+        option only when 1 variant has been installed, as any other variant
+        still installed will stop working and it's data will be removed.
     "
     exit 1
 }
@@ -66,7 +70,7 @@ main () {
     command -v ${SCRIPT_REQ} > /dev/null 2>&1
 
     case ${1} in
-        "install" | "uninstall" | "install-src")
+        "install" | "uninstall" | "uninstall-full" | "install-src")
             true
         ;;
         *)
