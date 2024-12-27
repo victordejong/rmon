@@ -4,6 +4,8 @@ Remote MONitoring, a system monitoring tool written in Rust.
 
 # Installation
 
+The installation scripts are currently only supported on Debian-like systems.
+
 Requirements before installation:
  * Python3
  * Python3-venv
