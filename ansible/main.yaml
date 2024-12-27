@@ -12,8 +12,7 @@
   tasks:
 
     - name: Import source installation tasks
-      include_tasks:
-        file: install-src.yaml
+      import_tasks: install-src.yaml
       tags: install-src
 
     - name: "Download the {{ variant }} binary"
@@ -105,8 +104,7 @@
     - name: Import uninstall-full tasks
       import_tasks: uninstall-full.yaml
       become: true
-      tags:
-        - uninstall-full
+      tags: uninstall-full
 
   handlers:
     - name: "Start and enable rmon-{{ variant }}"
