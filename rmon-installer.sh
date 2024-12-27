@@ -7,6 +7,7 @@ set -eo pipefail
 export INSTALL_DIR="/opt/rmon"
 export SCRIPT_WORKDIR="/tmp/rmon-installer"
 export SRC_REMOTE="https://gitlab.com/victordejong/rmon.git"
+export SRC_BRANCH="main"
 export RELEASE_TAG="permalink/latest"
 # Check installer requirements
 export SCRIPT_REQ="python python3-venv git"
@@ -51,7 +52,8 @@ script_help () {
 
 run () {
     (mkdir -p "${SCRIPT_WORKDIR}" || true) && cd "${SCRIPT_WORKDIR}"
-    (git clone "${SRC_REMOTE}" || (cd rmon && git pull && cd ..)) && cd "${SCRIPT_WORKDIR}"/rmon/ansible
+    (git clone -b "${SRC_BRANCH}" --depth 1 "${SRC_REMOTE}" || (cd rmon && git pull && cd ..)) \
+        && cd "${SCRIPT_WORKDIR}"/rmon/ansible
 
     # Activate venv
     ve python3 > /dev/null 2>&1
