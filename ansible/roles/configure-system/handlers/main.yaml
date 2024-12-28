@@ -1,0 +1,9 @@
+---
+
+- name: "Start and enable rmon-{{ variant }}"
+  systemd:
+    name: "rmon-{{ variant }}"
+    enabled: true
+    state: started
+    daemon_reload: true
+  become: true

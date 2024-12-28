@@ -1,0 +1,7 @@
+---
+
+- name: "Download the {{ variant }} binary"
+  get_url:
+    url: "https://gitlab.com/victordejong/rmon/-/releases/{{ release_tag }}/downloads/releases/rmon-{{ variant }}"
+    dest: "/tmp/rmon-installer/rmon-{{ variant }}"
+    mode: '0755'

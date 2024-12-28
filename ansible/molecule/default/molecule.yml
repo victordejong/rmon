@@ -1,0 +1,20 @@
+---
+driver:
+  name: docker
+platforms:
+  - name: test-instance
+    # you might want to add your own variables here based on what provisioning
+    # you are doing like:
+    image: rust
+provisioner:
+  name: ansible
+  env:
+    ANSIBLE_ROLES_PATH: "../../roles"
+scenario:
+  test_sequence:
+    - destroy
+    - create
+    - prepare
+    - converge
+    # - idempotence, skip this step as the combination of install and uninstall cannot be idempotent
+    - destroy

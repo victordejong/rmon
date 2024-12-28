@@ -1,0 +1,31 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+  tasks:
+
+    - name: Update APT cache and install dependencies
+      apt:
+        name:
+          - sudo
+          - python3
+          - python3-venv
+        update_cache: true
+
+    - name: Create the /tmp/rmon-installer directory
+      file:
+        path: /tmp/rmon-installer
+        state: directory
+        mode: '0755'
+
+    - name: Clone the rmon git repository
+      git:
+        repo: https://gitlab.com/victordejong/rmon.git
+        dest: /tmp/rmon-installer/rmon
+        version: main
+
+    - name: Download systemctl mock script
+      get_url:
+        url: https://raw.githubusercontent.com/gdraheim/docker-systemctl-replacement/refs/heads/master/files/docker/systemctl3.py
+        dest: /usr/bin/systemctl
+        mode: '0755'

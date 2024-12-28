@@ -1,0 +1,41 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: false
+
+  vars:
+    install_dir: /opt/rmon
+    release_tag: permalink/latest
+
+  roles:
+    - role: install-src
+      vars:
+        variant: client
+
+    - role: configure-system
+      vars:
+        variant: client
+
+    - role: install
+      vars:
+        variant: server
+
+    - role: configure-system
+      vars:
+        variant: server
+
+  tasks:
+
+    - meta: flush_handlers
+
+    - include_role:
+        name: uninstall
+        apply:
+          vars:
+            variant: client
+
+    - include_role:
+        name: uninstall-full
+        apply:
+          vars:
+            variant: server

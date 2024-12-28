@@ -4,7 +4,7 @@ extends: default
 rules:
   # 120 chars should be enough, but don't fail if a line is longer
   line-length:
-    max: 120
+    max: 180
     level: warning
 
   comments:
@@ -18,3 +18,6 @@ rules:
   octal-values:
     forbid-implicit-octal: true
     forbid-explicit-octal: true
+
+ignore:
+  - .venv/

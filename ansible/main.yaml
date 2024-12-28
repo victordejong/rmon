@@ -9,113 +9,25 @@
     install_dir: ~
     release_tag: ~
 
-  tasks:
-
-    - name: Import source installation tasks
-      import_tasks: install-src.yaml
+  roles:
+    - role: install-src
       tags: install-src
 
-    - name: "Download the {{ variant }} binary"
-      get_url:
-        url: "https://gitlab.com/victordejong/rmon/-/releases/{{ release_tag }}/downloads/releases/rmon-{{ variant }}"
-        dest: "/tmp/rmon-installer/rmon-{{ variant }}"
-        mode: '0755'
+    - role: install
       tags: install
 
-    - name: Create rmon system user
-      user:
-        name: rmon
-        comment: System user for the RMON suite
-        system: true
+    - role: configure-system
       become: true
       tags:
         - install
         - install-src
 
-    - name: Create target configuration directory /etc/rmon
-      file:
-        path: /etc/rmon
-        owner: root
-        group: rmon
-        mode: '0750'
-        state: directory
-      become: true
-      tags:
-        - install
-        - install-src
-
-    - name: "Create target installation directory {{ install_dir }}/bin"
-      file:
-        path: "{{ install_dir }}/bin"
-        owner: rmon
-        group: rmon
-        mode: '0755'
-        state: directory
-      become: true
-      tags:
-        - install
-        - install-src
-
-    - name: "Copy {{ variant }} binary to target installation directory"
-      copy:
-        src: "/tmp/rmon-installer/rmon-{{ variant }}"
-        dest: "{{ install_dir }}/bin/rmon-{{ variant }}"
-        remote_src: true
-        owner: rmon
-        group: rmon
-        mode: '0755'
-      become: true
-      tags:
-        - install
-        - install-src
-
-    - name: "Copy the {{ variant }} default config to target config directory"
-      copy:
-        src: "rmon-{{ variant }}.yaml"
-        dest: "/etc/rmon/rmon-{{ variant }}.yaml"
-        owner: root
-        group: root
-        mode: '0644'
-      become: true
-      tags:
-        - install
-        - install-src
-
-    - name: "Copy {{ variant }} systemd unit file"
-      template:
-        src: rmon.service
-        dest: "/usr/lib/systemd/system/rmon-{{ variant }}.service"
-        owner: root
-        group: root
-        mode: '0644'
-      become: true
-      notify: "Start and enable rmon-{{ variant }}"
-      tags:
-        - install
-        - install-src
-
-    - name: Import uninstall tasks
-      import_tasks: uninstall.yaml
+    - role: uninstall
       become: true
       tags:
         - uninstall
         - uninstall-full
 
-    - name: Import uninstall-full tasks
-      import_tasks: uninstall-full.yaml
+    - role: uninstall-full
       become: true
       tags: uninstall-full
-
-  handlers:
-    - name: "Start and enable rmon-{{ variant }}"
-      systemd:
-        name: "rmon-{{ variant }}"
-        enabled: true
-        state: started
-        daemon_reload: true
-      become: true
-
-    - name: Reload systemd
-      systemd:
-        daemon_reload: true
-      become: true
