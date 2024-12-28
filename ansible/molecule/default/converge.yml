@@ -26,15 +26,18 @@
 
   tasks:
 
-    - meta: flush_handlers
+    - name: Flush handlers before uninstall
+      meta: flush_handlers
 
-    - include_role:
+    - name: Run the uninstall role within the tasks
+      include_role:
         name: uninstall
         apply:
           vars:
             variant: client
 
-    - include_role:
+    - name: Run the uninstall-full role within the tasks
+      include_role:
         name: uninstall-full
         apply:
           vars:
