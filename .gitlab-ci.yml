@@ -71,7 +71,7 @@ ansible-test:
     - apk add python3 py3-virtualenv git
   script:
     - cd ansible
-    - ./test.sh
+    - bash test.sh
   # rules:
   #   - changes:
   #     - ansible/**/*
