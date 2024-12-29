@@ -68,7 +68,7 @@ ansible-test:
   before_script:
     - docker info
     - apk update
-    - apk add python3 py3-virtualenv git -y
+    - apk add python3 py3-virtualenv git
   script:
     - cd ansible
     - ./test.sh
