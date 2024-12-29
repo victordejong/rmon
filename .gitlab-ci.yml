@@ -72,9 +72,9 @@ ansible-test:
   script:
     - cd ansible
     - bash test.sh
-  # rules:
-  #   - changes:
-  #     - ansible/**/*
+  rules:
+    - changes:
+      - ansible/**/*
 
 rust-build:client:
   extends: .rust-build
