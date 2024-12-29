@@ -60,6 +60,22 @@ rust-check:server:
     - cd server/
     - cargo check
 
+ansible-test:
+  stage: test
+  image: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker info
+    - apt update
+    - apt install python3 python3-venv git -y
+  script:
+    - cd ansible
+    - ./test.sh
+  rules:
+    - changes:
+      - ansible/**/*
+
 rust-build:client:
   extends: .rust-build
   script:
