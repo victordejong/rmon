@@ -42,7 +42,7 @@ ansible-lint:
 
 shellcheck:
   stage: lint
-  image: koalaman/shellcheck-alpine
+  image: registry.gitlab.com/pipeline-components/shellcheck:latest
   script:
     - find . -name "*.sh" -type f | xargs shellcheck
 
